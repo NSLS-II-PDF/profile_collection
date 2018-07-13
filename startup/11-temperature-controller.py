@@ -46,6 +46,7 @@ eurotherm = Eurotherm('XF:28IDC-ES:1{Env:04}T-I',
                                  write_pv='XF:28IDC-ES:1{Env:04}T-SP',
                                  tolerance= 3, name='eurotherm')
 """
+heater_dict = {(4, 100): 0, (100, 200): 1, (200, 300): 2}
 
 class CryoStream(Device):
     # readback
@@ -66,6 +67,7 @@ class CryoStream(Device):
     cntrl = Cpt(EpicsSignal, ':OUT1:Cntrl', string=True)
     # trigger signal
     trig = Cpt(EpicsSignal, ':read.PROC')
+    auto=True
 
     #def trigger(self):
         #self.trig.put(1, wait=True)
@@ -96,6 +98,11 @@ class CryoStream(Device):
 
     def set(self, val):
         self._target = val
+        if self.auto:
+            for (low, hi), heater in heater_dict:
+                if low < val < hi:
+                    self.heater.set(heater)
+                    break
         self.setpoint.put(val)#, wait=True)
         sts = self._sts = DeviceStatus(self)
         #self.scan.put('.2 second')
