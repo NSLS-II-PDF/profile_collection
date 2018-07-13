@@ -46,7 +46,7 @@ eurotherm = Eurotherm('XF:28IDC-ES:1{Env:04}T-I',
                                  write_pv='XF:28IDC-ES:1{Env:04}T-SP',
                                  tolerance= 3, name='eurotherm')
 """
-heater_dict = {(4, 100): 0, (100, 200): 1, (200, 300): 2}
+heater_dict = {(4, 30): 1, (30, 80): 2, (80, 600): 3}
 
 class CryoStream(Device):
     # readback
