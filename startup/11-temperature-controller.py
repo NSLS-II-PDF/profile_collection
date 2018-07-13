@@ -168,9 +168,10 @@ class CryoStat1(Device):
 
     def set(self, val):
         self._target = val
-        for (low, hi), heater_pos in heater_dict.items():
-            if low < pos <= hi:
-                self.heater.set(heater_pos)
+        if self.auto:
+            for (low, hi), heater_pos in heater_dict.items():
+                if low < pos <= hi:
+                    self.heater.set(heater_pos)
         self.setpoint.put(val, wait=True)
         sts = self._sts = DeviceStatus(self)
         self.scan.put('.2 second')
