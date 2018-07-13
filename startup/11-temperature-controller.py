@@ -67,7 +67,6 @@ class CryoStream(Device):
     cntrl = Cpt(EpicsSignal, ':OUT1:Cntrl', string=True)
     # trigger signal
     trig = Cpt(EpicsSignal, ':read.PROC')
-    auto=True
 
     #def trigger(self):
         #self.trig.put(1, wait=True)
@@ -98,11 +97,6 @@ class CryoStream(Device):
 
     def set(self, val):
         self._target = val
-        if self.auto:
-            for (low, hi), heater in heater_dict:
-                if low < val < hi:
-                    self.heater.set(heater)
-                    break
         self.setpoint.put(val)#, wait=True)
         sts = self._sts = DeviceStatus(self)
         #self.scan.put('.2 second')
@@ -142,6 +136,8 @@ class CryoStat1(Device):
     # trigger signal
     trig = Cpt(EpicsSignal, ':read.PROC')
 
+    auto=True
+    
     def trigger(self):
         self.trig.put(1, wait=True)
         return DeviceStatus(self, done=True, success=True)
@@ -172,6 +168,9 @@ class CryoStat1(Device):
 
     def set(self, val):
         self._target = val
+        for (low, hi), heater_pos in heater_dict.items():
+            if low < pos <= hi:
+                self.heater.set(heater_pos)
         self.setpoint.put(val, wait=True)
         sts = self._sts = DeviceStatus(self)
         self.scan.put('.2 second')
