@@ -26,19 +26,19 @@ class SideBounceMono(Device):
     twist = Cpt(EpicsMotor, "Twist}Mtr")
 
 sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
+
+
+class PDFShutter(EpicsSignal):
+
+    def stop(self):
+        self.set(0)
+
+    def resume(self):
+        self.set(1)
+
+
 # Shutters:
-fs = EpicsSignal('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
-
-
-def shutter_stop():
-    fs.set(0)
-
-
-def shutter_resume():
-    fs.set(1)
-
-fs.stop = shutter_stop()
-fs.resume = shutter_resume()
+fs = PDFShutter('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
 
 
 class Mirror(Device):
