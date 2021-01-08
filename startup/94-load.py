@@ -71,13 +71,11 @@ if os.path.isdir(HOME_DIR):
 else:
     os.chdir(BASE_DIR)
 
-from xpdacq.calib import *
-
-# We are adding this here because the previous 
-# line overwrites our logger config. This undoes the logger changes.
+# See https://github.com/silx-kit/pyFAI/issues/1399#issuecomment-694185304
 import logging
-logging.getLogger().handlers.clear()
+logging.getLogger().addHandler(logging.NullHandler())
 
+from xpdacq.calib import *
 
 # analysis functions, only at beamline
 #from xpdan.data_reduction import *

@@ -83,14 +83,6 @@ RE.md = PersistentDict(runengine_metadata_dir)
 
 # RE.msg_hook = ts_msg_hook
 
-########## New logging 8/24/2020
-
-import logging
-#logging.getLogger('ophyd').handlers[0].setLevel('WARNING')
-logger = logging.getLogger('ophyd')
-logger.setLevel('WARNING')
-
-###########
 
 RE.md['facility'] = 'NSLS-II'
 RE.md['group'] = 'PDF'
