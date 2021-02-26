@@ -14,6 +14,8 @@
 #
 ##############################################################################
 import os
+import yaml
+
 from xpdacq.xpdacq_conf import (glbl_dict, configure_device,
                                 _reload_glbl, _set_glbl,
                                 _load_beamline_config)
@@ -53,7 +55,8 @@ xrun = CustomizedRunEngine(None)
 xrun.md['beamline_id'] = glbl['beamline_id']
 xrun.md['group'] = glbl['group']
 xrun.md['facility'] = glbl['facility']
-beamline_config = _load_beamline_config(glbl['blconfig_path'])
+with open(glbl['blconfig_path'], "r") as f:
+    beamline_config = yaml.unsafe_load(f)
 xrun.md['beamline_config'] = beamline_config
 
 # insert header to db, either simulated or real
