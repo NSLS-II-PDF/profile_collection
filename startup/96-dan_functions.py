@@ -14,8 +14,12 @@ plt.ion()
 
 
 ##############
-#slack_token = os.environ["SLACK_API_TOKEN"]
-#client = WebClient(token=slack_token)
+try:
+    slack_token = os.environ["SLACK_API_TOKEN"]
+except KeyError:
+    client = None
+else:
+    client = WebClient(token=slack_token)
 
 
 ###
@@ -94,7 +98,7 @@ def show_me_db(
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
             else:
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
-    
+
             my_im = my_im - dark_im
         else:
             print("this run has no associated dark")
