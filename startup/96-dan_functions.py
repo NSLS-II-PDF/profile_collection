@@ -14,8 +14,12 @@ plt.ion()
 
 
 ##############
-#slack_token = os.environ["SLACK_API_TOKEN"]
-#client = WebClient(token=slack_token)
+try:
+    slack_token = os.environ["SLACK_API_TOKEN"]
+except KeyError:
+    client = None
+else:
+    client = WebClient(token=slack_token)
 
 
 ###
@@ -88,7 +92,7 @@ def show_me_db_streams(
         my_im = np.array(list(db[my_id].data(my_det_probably, stream_name="primary")))[0][0]
     else:
         print ("Primary stream missing, wtf.")
-    
+
     my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
 
     if len(my_im) == 0:
@@ -137,7 +141,7 @@ def show_me_db(
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
             else:
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
-    
+
             my_im = my_im - dark_im
         else:
             print("this run has no associated dark")
@@ -805,7 +809,7 @@ def set_Pilatus_parameters(num_images=1, exposure_time=0.1):
     pilatus1.set_num_images(num_images)
     print ('setting exposure time for a single image to '+str(exposure_time))
     pilatus1.set_exposure_time(exposure_time)
-    
+
 
 def show_me2(my_im, count_low=0, count_high=1, use_colorbar=False, use_cmap='viridis'):
     #my_low = np.percentile(my_im, per_low)
@@ -842,7 +846,7 @@ def show_me_db2(
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
             else:
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
-    
+
             my_im = my_im - dark_im
         else:
             print("this run has no associated dark")
@@ -850,7 +854,6 @@ def show_me_db2(
         return my_im
     if return_dark:
         return dark_im
-    
+
     #if all else fails, plot!
     show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
-
