@@ -12,7 +12,7 @@ This file will do the following changes to the name space:
 XpdAcq < 1.1.0 uses the 94-load.bak file.
 """
 import xpdacq
-
+import yaml
 xpdacq_version = tuple(map(int, xpdacq.__version__.split(".")))
 
 if xpdacq_version < (1, 1, 0):
@@ -57,7 +57,8 @@ if xpdacq_version < (1, 1, 0):
     xrun.md['beamline_id'] = glbl['beamline_id']
     xrun.md['group'] = glbl['group']
     xrun.md['facility'] = glbl['facility']
-    beamline_config = _load_beamline_config(glbl['blconfig_path'])
+    with open(glbl['blconfig_path'], "r") as f:
+        beamline_config = yaml.unsafe_load(f)
     xrun.md['beamline_config'] = beamline_config
 
     # insert header to db, either simulated or real
