@@ -33,10 +33,10 @@ class SoftLinkCallBack(CallbackBase):
         self.data_info_keys = data_info_keys
         self.root = root
         if data_info_keys is None:
-            data_info_keys=[ 
-                ('start', 'Proposal ID')
-                ('start', 'sample_name')
-                ('start', 'wavelength')
+            data_info_keys=[
+                ('start', 'Proposal ID'),
+                ('start', 'sample_name'),
+                ('start', 'wavelength'),
                 ('event', 'data', 'Det_1_Z')
             ]
         self.data_info_keys = data_info_keys
