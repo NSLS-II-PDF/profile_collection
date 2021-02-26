@@ -31,7 +31,7 @@ def slack_message(my_message):
         )
     # except SlackApiError as e:
     #    assert e.response["something went wrong"]
-    except:
+    except Exception:
         print("slack message failed")
 
 
