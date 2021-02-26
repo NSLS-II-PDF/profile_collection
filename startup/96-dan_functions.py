@@ -38,21 +38,25 @@ else:
 #         print("slack message failed")
 
 
-#def check_heartbeat(
-#    fname="hbeat.txt", tlapse=300, send_warning=False, notify_user=False
-#):
-#    fin = open(fname, "r")
-#    tread = float(fin.read())
-#    tpassed = time.time() - tread
-#    if tpassed > tlapse:
-#        tpassed_str = str(tpassed / 60)[:3]
-#        if send_warning:
-#            msg_to_send = "Issue detected, no pulse in " + tpassed_str + " mins"
-#            if notify_user:
-#                msg_to_send = "<@" + str(user_ID) + "> " + msg_to_send
-#            slack_message(msg_to_send)
-#        return False
-#    return True
+# def check_heartbeat(
+#     fname="hbeat.txt",
+#     tlapse=300,
+#     send_warning=False,
+#     notify_user=False,
+#     user_ID="ULP5FCDDH",
+# ):
+#     fin = open(fname, "r")
+#     tread = float(fin.read())
+#     tpassed = time.time() - tread
+#     if tpassed > tlapse:
+#         tpassed_str = str(tpassed / 60)[:3]
+#         if send_warning:
+#             msg_to_send = "Issue detected, no pulse in " + tpassed_str + " mins"
+#             if notify_user:
+#                 msg_to_send = "<@" + str(user_ID) + "> " + msg_to_send
+#             slack_message(msg_to_send)
+#         return False
+#return True
 
 
 #def update_heartbeat(fname="hbeat.txt"):
@@ -360,7 +364,7 @@ def make_me_a_dataframe(found_pos,cut_start = None, cut_end = None):
         read_xcel = read_xcel.loc[cut_start:cut_end,:]
         read_xcel.index = range(len(read_xcel.index))
 
-    print ('expecting length '+str(len(np.array(read_xcel.index))))
+    print("expecting length " + str(len(np.array(read_xcel.index))))
 
     df_sample_pos_info = pd.DataFrame(index=np.array(read_xcel.index))
     df_sample_pos_info["name"] = read_xcel.iloc[:, 0]
@@ -370,7 +374,6 @@ def make_me_a_dataframe(found_pos,cut_start = None, cut_end = None):
     df_sample_pos_info["xpdacq_scanplan_num"] = 5 * np.ones(
         len(read_xcel.index), dtype=int
     )
-
 
     return df_sample_pos_info
 
@@ -622,6 +625,7 @@ def _identify_peaks_scan_shifter_pos(
 
 def get_total_counts():
     from epics import caget
+
     return float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
     #return float(caget("XF:28ID1-ES{Det:PE2}Stats1:Total_RBV")) #for pe2c
 
