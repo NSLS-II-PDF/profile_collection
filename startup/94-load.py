@@ -120,5 +120,14 @@ else:
     # Remove the variables that won't be used
     del UserInterface, ui
 
-# remove the uselss names
-del xpdacq_version
+    # remove the uselss names
+    del xpdacq_version
+
+
+class MoreCustomizedRunEngine(CustomizedRunEngine):
+    def __call__(self, plan, *args, **kwargs):
+        super().__call__({}, plan, *args, **kwargs)
+
+RE = MoreCustomizedRunEngine(xrun.md)
+# insert header to db, either simulated or real
+xrun.subscribe(db.insert, 'all')
