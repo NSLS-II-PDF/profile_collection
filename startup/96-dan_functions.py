@@ -25,17 +25,17 @@ else:
 ###
 
 
-#def slack_message(my_message):
-#    try:
-#        response = client.chat_postMessage(
-#            channel="pdf_dev",
-#            # channel = user_name,
-#            text=my_message,
-#        )
-#    # except SlackApiError as e:
-#    #    assert e.response["something went wrong"]
-#    except:
-#        print("slack message failed")
+# def slack_message(my_message):
+#     try:
+#         response = client.chat_postMessage(
+#             channel="pdf_dev",
+#             # channel = user_name,
+#             text=my_message,
+#         )
+#     # except SlackApiError as e:
+#     #    assert e.response["something went wrong"]
+#     except Exception:
+#         print("slack message failed")
 
 
 #def check_heartbeat(
