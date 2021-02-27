@@ -9,6 +9,7 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import LiveTable
 import uuid
 import numpy as np
+from xpdacq.xpdacq import translate_to_sample
 
 
 ##############
@@ -670,3 +671,12 @@ def simple_ct(dets, exposure, *, md=None):
     plan = bp.count(dets, md=_md)
     plan = bpp.subs_wrapper(plan, LiveTable([]))
     return (yield from plan)
+
+def sample_aware_count(dets, sample_num: int, exposure: float, *, md=None):
+    """
+    A wrapper around count that tries to mimic xpdacq.
+
+    """
+    _md = translate_to_sample(bt, sample_num)
+    _md.update(md or {})
+    yield from simple_ct(dets, exposure, md=_md)
