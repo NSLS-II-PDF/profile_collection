@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 plt.ion()
+from xpdacq.xpdacq import translate_to_sample
 
 
 ##############
@@ -862,3 +863,11 @@ def show_me_db2(
 
     #if all else fails, plot!
     show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
+def sample_aware_count(dets, sample_num: int, exposure: float, *, md=None):
+    """
+    A wrapper around count that tries to mimic xpdacq.
+
+    """
+    _md = translate_to_sample(bt, sample_num)
+    _md.update(md or {})
+    yield from simple_ct(dets, exposure, md=_md)
