@@ -150,9 +150,7 @@ def write_single_calibration_data_to_csv_and_make_tom_sad(uid, path=Path(".")):
     return tbl
 
 
-def write_calibration_data_to_csv_and_make_tom_sad(
-    uid_list, path=Path("/tmp/sorensen_calibration.csv")
-):
+def write_calibration_data_to_csv_and_make_tom_sad(uid_list, *, fname=None):
     headers = [db[uid] for uid in uid_list]
     headers = sorted(headers, key=lambda h: h.start["time"])
 
@@ -162,7 +160,8 @@ def write_calibration_data_to_csv_and_make_tom_sad(
     ).dt.total_seconds()
     merged_table = merged_table.set_index(merged_table["delta"])
 
-    merged_table.to_csv(path)
+    if fname is not None:
+        merged_table.to_csv(fname)
     return merged_table
 
 
