@@ -301,48 +301,100 @@ except ImportError:
             return data["value"]
 
 
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class MotorPositions:
+    beamstop_x: float
+    beamstop_y: float
+    detector: float
+
+
 def power_ramp_controlled(
-    min_power, max_power, xrd_sample_name, pdf_sample_name, exposure
+    *,
+    min_power_pct: float = 0,
+    max_power_pct: float = 1,  # max 100
+    xrd_sample_name: str,
+    pdf_sample_name: str,
+    exposure: float,
+    beamtime,
+    n_per_step=1,
+    near_positions,
+    far_positions,
 ):
     ramp_uid = str(uuid.uuid4())
     xrd_sample = beamtime.samples[xrd_sample_name]
     pdf_sample = beamtime.samples[pdf_sample_name]
 
+    detector_motor = Det_1_Z
+    beam_stop = BStop1
+
     baseline_detectors = [
         lakeshore336,
         ring_current,
-        sorensen850_manual,
         beam_stop,
         detector_motor,
+        Grid_X,
+        Grid_Y,
+        Grid_Z,
     ]
-    main_detectors = [pe1c, sorensen850_manual, lakeshore336]
+    main_detectors = [pe1c, sorensen850_manual]
 
-    def collect_cycle(ramp_phase):
+    motor_snap_shot_for_dan = {
+        k: locals()[k].read() for k in ["Grid_X", "Grid_Y", "Grid_Z"]
+    }
 
-        yield from bps.mv(beam_stop, BEAMSTOP_POS_XRD, detector_motor, DETECTOR_POS_XRD)
+    def collect_cycle(ramp_phase, delta=0):
+        # PDF measurement
+        yield from bps.mv(
+            beam_stop.x,
+            near_positions.beamstop_x,
+            beam_stop.y,
+            near_positions.beamstop_y,
+            detector_motor,
+            near_positions.detector,
+        )
         yield from bpp.baseline_wrapper(
             simple_ct(
                 main_detectors,
-                md={"ramp_uid": ramp_uid, "ramp_phase": ramp_phase, **xrd_sample},
-                **kwargs,
+                md={
+                    "ramp_uid": ramp_uid,
+                    "ramp_phase": ramp_phase,
+                    **pdf_sample,
+                    **motor_snap_shot_for_dan,
+                    "delta": delta,
+                },
                 exposure=exposure,
             ),
             baseline_detectors,
         )
-
-        yield from bps.mv(beam_stop, BEAMSTOP_POS_PDF, detector_motor, DETECTOR_POS_PDF)
+        # XRD measurement
+        yield from bps.mv(
+            beam_stop.x,
+            far_positions.beamstop_x,
+            beam_stop.y,
+            far_positions.beamstop_y,
+            detector_motor,
+            far_positions.detector,
+        )
         yield from bpp.baseline_wrapper(
             simple_ct(
                 main_detectors,
-                md={"ramp_uid": ramp_uid, "ramp_phase": ramp_phase, **pdf_sample},
-                **kwargs,
+                md={
+                    "ramp_uid": ramp_uid,
+                    "ramp_phase": ramp_phase,
+                    **xrd_sample,
+                    **motor_snap_shot_for_dan,
+                },
                 exposure=exposure,
             ),
             baseline_detectors,
         )
 
     yield from bps.mv(ramp_control.done, 0)
-    p = min_power
+
+    p = min_power_pct
     yield from bps.mv(sorensen850_manual, p)
 
     yield from collect_cycle("initial")
@@ -357,10 +409,12 @@ def power_ramp_controlled(
         else:
             ramp_phase = "holding"
 
-        p = np.clip(p + delta, min_power, max_power)
+        p = np.clip(p + delta, min_power_pct, max_power_pct)
 
         yield from bps.mv(sorensen850_manual, p)
-        yield from collect_cycle(ramp_phase)
+
+        for j in range(n_per_step):
+            yield from collect_cycle(ramp_phase, delta)
         done = yield from rd(ramp_control.done, default_value=True)
 
     yield from bps.collect_cycle("final")
