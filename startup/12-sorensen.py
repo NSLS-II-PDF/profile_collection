@@ -341,7 +341,7 @@ def power_ramp_controlled(
     main_detectors = [pe1c, sorensen850_manual]
 
     motor_snap_shot_for_dan = {
-        k: locals()[k].read() for k in ["Grid_X", "Grid_Y", "Grid_Z"]
+        k: globals()[k].read() for k in ["Grid_X", "Grid_Y", "Grid_Z"]
     }
 
     def collect_cycle(ramp_phase, delta=0):
