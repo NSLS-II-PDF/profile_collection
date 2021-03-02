@@ -2,8 +2,10 @@ from ophyd import EpicsSignal
 import numpy as np
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
+import time as ttime
 
 
+# This is fixed in ophyd 1.6.2
 def _paranoid_set_and_wait(
     signal, val, poll_time=0.01, timeout=10, rtol=None, atol=None
 ):
@@ -150,11 +152,13 @@ def write_single_calibration_data_to_csv_and_make_tom_sad(uid, path=Path(".")):
     return tbl
 
 
-def write_calibration_data_to_csv_and_make_tom_sad(uid_list, *, fname=None):
+def write_calibration_data_to_csv_and_make_tom_sad(
+    uid_list, *, fname=None, stream_name="primary"
+):
     headers = [db[uid] for uid in uid_list]
     headers = sorted(headers, key=lambda h: h.start["time"])
 
-    merged_table = pd.concat([h.table() for h in headers])
+    merged_table = pd.concat([h.table(stream_name=stream_name) for h in headers])
     merged_table["delta"] = (
         merged_table["time"] - merged_table["time"].iloc[0]
     ).dt.total_seconds()
@@ -321,6 +325,7 @@ def power_ramp_controlled(
     n_per_step=1,
     near_positions,
     far_positions,
+    diagostic_T_file=None,
 ):
     ramp_uid = str(uuid.uuid4())
     xrd_sample = beamtime.samples[xrd_sample_name]
@@ -354,7 +359,7 @@ def power_ramp_controlled(
             detector_motor,
             near_positions.detector,
         )
-        yield from bpp.baseline_wrapper(
+        pdf_uid = yield from bpp.baseline_wrapper(
             simple_ct(
                 main_detectors,
                 md={
@@ -377,7 +382,7 @@ def power_ramp_controlled(
             detector_motor,
             far_positions.detector,
         )
-        yield from bpp.baseline_wrapper(
+        xrd_uid = yield from bpp.baseline_wrapper(
             simple_ct(
                 main_detectors,
                 md={
@@ -390,13 +395,16 @@ def power_ramp_controlled(
             ),
             baseline_detectors,
         )
+        return [pdf_uid, xrd_uid]
+
+    uids = []
 
     yield from bps.mv(ramp_control.done, 0)
 
     p = min_power_pct
     yield from bps.mv(sorensen850_manual, p)
 
-    yield from collect_cycle("initial")
+    uids.append((yield from collect_cycle("initial")))
 
     done = yield from rd(ramp_control.done, default_value=True)
     while not done:
@@ -413,8 +421,12 @@ def power_ramp_controlled(
         yield from bps.mv(sorensen850_manual, p)
 
         for j in range(n_per_step):
-            yield from collect_cycle(ramp_phase, delta)
+            uids.append((yield from collect_cycle(ramp_phase, delta)))
+            if diagostic_T_file is not None:
+                write_calibration_data_to_csv_and_make_tom_sad(
+                    uids, fname=diagostic_T_file, stream_name="baseline"
+                )
         done = yield from rd(ramp_control.done, default_value=True)
 
-    yield from bps.collect_cycle("final")
-
+    uids.append((yield from bps.collect_cycle("final")))
+    return uids
