@@ -1,0 +1,158 @@
+_dark_dict_list:
+- acq_time: 5
+  exposure: 5
+  timestamp: 1614460063.2800422
+  uid: 37d192fb-df2c-44a9-b41b-2a05c9751247
+- acq_time: 5
+  exposure: 5
+  timestamp: 1614460242.3911414
+  uid: cf374ae7-2ed5-4e5d-9563-f4841a3759e9
+- acq_time: 5
+  exposure: 5
+  timestamp: 1614460464.3035522
+  uid: 5fc90d2e-ef96-4ca7-9207-ae72121923d0
+- acq_time: 5
+  exposure: !!python/object/apply:numpy.core.multiarray.scalar
+  - &id001 !!python/object/apply:numpy.dtype
+    args:
+    - f8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    AAAAAAAAFEA=
+  timestamp: 1614460566.1485345
+  uid: 12c2f3ca-b459-4180-a12e-2b2d4b6d5aa8
+- acq_time: 5
+  exposure: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAFEA=
+  timestamp: 1614464054.0055833
+  uid: 5bf51ebe-6439-4815-a9bb-0c824fd3afe8
+- acq_time: 5
+  exposure: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAFEA=
+  timestamp: 1614464263.5876548
+  uid: 25d95820-b20f-4d37-901d-6c96c86462a1
+- acq_time: 5
+  exposure: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAFEA=
+  timestamp: 1614464433.3411603
+  uid: bb969c1c-2e41-4914-91db-3440b576c752
+- acq_time: 5
+  exposure: !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAFEA=
+  timestamp: 1614464443.6444564
+  uid: 319ccd2f-7483-459c-96ac-e308b150006e
+_exclude_dir:
+- /mnt/data/bnl/xpdacq_special/data/user_data
+- /mnt/data/bnl/xpdacq_special/data/xpdConfig
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml
+_export_tar_dir:
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base
+- /mnt/data/bnl/xpdacq_special/data/user_data/userScripts
+all_folders: &id002
+- /mnt/data/bnl/xpdacq_special/data/user_data
+- /mnt/data/bnl/xpdacq_special/data/xpdConfig
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml/samples
+- /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml/scanplans
+- /mnt/data/bnl/xpdacq_special/data/user_data/tiff_base
+- /mnt/data/bnl/xpdacq_special/data/user_data/userScripts
+- /mnt/data/bnl/xpdacq_special/data/user_data/Import
+- /mnt/data/bnl/xpdacq_special/data/user_data/userAnalysis
+allfolders: *id002
+archive_base_dir: /mnt/data/bnl/xpdacq_special/archive/.userbeamtimearchive
+archive_base_dir_name: .userbeamtimearchive
+archive_dir: /mnt/data/bnl/xpdacq_special/archive/.userbeamtimearchive/2021
+archive_root_dir: /mnt/data/bnl/xpdacq_special/archive
+auto_dark: true
+auto_load_calib: true
+base: /mnt/data/bnl/xpdacq_special/data
+base_dir: /mnt/data/bnl/xpdacq_special/data
+beamline_host_name:
+- jupiter
+beamline_id: 28-ID-1
+blconfig_dir: /mnt/data/bnl/xpdacq_special/data/xpdConfig
+blconfig_dir_name: xpdConfig
+blconfig_name: xpd_beamline_config.yml
+blconfig_path: /mnt/data/bnl/xpdacq_special/data/xpdConfig/xpd_beamline_config.yml
+bt_dir: /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml
+calib_config_name: xpdAcq_calib_info.yml
+config_base: /mnt/data/bnl/xpdacq_special/data/user_data/config_base
+dark_field_key: sc_dk_field_uid
+dark_window: 0.1
+det_image_field: &id003
+- pe1c_image
+- pe2c_image
+- dexela_image
+- dexela
+diffraction_dets:
+- pe1c
+- pe1
+- pe2c
+- pe2
+- dexela_image
+- dexela
+dk_window: 0.1
+exp_broker_name: pdf
+exp_hash_uid: f4be92ca-79c1-49ae-9bcd-59c7a8185aa3
+facility: NSLS-II
+frame_acq_time: 0.1
+frame_acquire_time: 0.1
+glbl_yaml_name: glbl.yml
+glbl_yaml_path: /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml/glbl.yml
+group: XPD
+home: /mnt/data/bnl/xpdacq_special/data/user_data
+home_dir: /mnt/data/bnl/xpdacq_special/data/user_data
+home_dir_name: user_data
+image_field: pe1c_image
+image_fields: *id003
+import_dir: /mnt/data/bnl/xpdacq_special/data/user_data/Import
+inbound_proxy_address: xf28id1-ca1:5577
+is_simulation: false
+mask_kwargs:
+  alpha: 3.0
+  bs_width: 13
+  edge: 30
+  lower_thresh: 0.0
+  tri_offset: 13
+  v_asym: 0
+name: glbl
+outbound_proxy_address: xf28id1-ca1:5578
+owner: PDF
+radiogram_dets:
+- blackfly_det
+radiograph_names:
+- blackfly_det
+sample_dir: /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml/samples
+scanplan_dir: /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml/scanplans
+shutter_conf:
+  close: 0
+  open: 1
+shutter_control: true
+shutter_sleep: 0
+simulation: false
+tiff_base: /mnt/data/bnl/xpdacq_special/data/user_data/tiff_base
+user_backup_dir_name: '2021'
+userscript_dir: /mnt/data/bnl/xpdacq_special/data/user_data/userScripts
+usrAnalysis_dir: /mnt/data/bnl/xpdacq_special/data/user_data/userAnalysis
+usrScript_dir: /mnt/data/bnl/xpdacq_special/data/user_data/userScripts
+xpdconfig: /mnt/data/bnl/xpdacq_special/data/xpdConfig
+yaml_dir: /mnt/data/bnl/xpdacq_special/data/user_data/config_base/yml
