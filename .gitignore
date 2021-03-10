@@ -86,3 +86,5 @@ db/
 static/
 history.sqlite
 Link\ to\ startup
+
+.vscode/
