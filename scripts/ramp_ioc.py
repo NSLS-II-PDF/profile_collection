@@ -24,6 +24,7 @@ class SimpleIOC(PVGroup):
         name="RampDone-Cmd",
     )
     delta = pvproperty(value=0.1, doc="The delta of the ramp rate.", name="RampDelta")
+    take = pvproperty(value=0, doc="If XRD data should be taken", name="TakeXRD-Cmd",)
 
 
 if __name__ == "__main__":
