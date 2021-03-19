@@ -3,7 +3,9 @@
 # cp -v <...> ~/.ipython/profile_${TEST_PROFILE}/
 
 # xpdacq is already installed in the 'collection-2021-1.2' conda env.
-# conda install -y -c ${CONDA_CHANNEL_NAME} xpdacq
+if [ "$CONDA_ENV_NAME" == "collection-2021-1.0" ]; then
+    conda install -y -c ${CONDA_CHANNEL_NAME} xpdacq
+fi
 
 mkdir -v -p ~/.config/acq/
 mkdir -v -p ~/user_data/config_base/yml/
