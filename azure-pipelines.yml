@@ -3,9 +3,7 @@ resources:
     - repository: templates
       type: github
       name: NSLS-II/profile-collection-ci
-      # TODO: change it back to 'refs/heads/main' once
-      # https://github.com/NSLS-II/profile-collection-ci/pull/19 is merged.
-      ref: refs/heads/add-collection-2021-1.2
+      ref: refs/heads/main
       endpoint: github
 
 jobs:
