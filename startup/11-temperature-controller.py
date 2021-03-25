@@ -348,3 +348,5 @@ hotairblower=Eurotherm('XF:28ID1-ES:1{Env:05}LOOP1:PV:RBV',
 #hotairblower=Eurotherm('XF:28ID1-ES:1{Env:03}T-I',
 #        write_pv='XF:28ID1-ES:1{Env:03}T-SP',
 #        tolerance=1,name='hotairblower')
+
+sorensen850_manual = EpicsSignal('XF:28ID1-ES{LS336:1-Out:3}Out:Man-RB', write_pv='XF:28ID1-ES{LS336:1-Out:3}Out:Man-SP', name='sorensen850_manual')

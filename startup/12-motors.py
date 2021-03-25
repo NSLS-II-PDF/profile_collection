@@ -75,4 +75,5 @@ ECS_An_tth = EpicsMotor('XF:28ID1B-ES{ECS-Ax:2Th2}Mtr', name='ECS_An_tth', label
 #detector for ECS - DO and MA
 ECS_det1 = EpicsSignalRO(  'XF:28IDC-BI:1{IM:1}:C4_1' ,name='ECS_det1')
 
-
+#45-degree shifting motor on M6-grid, for use with hot air blower / cryostream with angled sample bracket
+broadside45_shifter = EpicsMotor('XF:28ID1B-ES{Smpl:Array-Ax:Horiz}Mtr', name='broadside45_shifter') 

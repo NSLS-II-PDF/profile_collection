@@ -19,7 +19,6 @@ import yaml
 from xpdacq.xpdacq_conf import (glbl_dict, configure_device,
                                 _reload_glbl, _set_glbl,
                                 _load_beamline_config)
-
 # configure experiment device being used in current version
 if glbl_dict['is_simulation']:
     from xpdacq.simulation import (xpd_pe1c, db, cs700, shctl1,

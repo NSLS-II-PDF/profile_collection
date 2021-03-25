@@ -113,7 +113,7 @@ def xrd_map(
        How far to move beyond the fly dimensions to get up to speed
 
     snake : bool
-       If we should "snake" or "typewriter" the fly axis
+       If we should "snake" or "comb" the fly axis
 
     """
     # TODO input validation
@@ -170,9 +170,17 @@ def xrd_map(
     speed = abs(fly_stop - fly_start) / (fly_pixels * computed_dwell_time)
 
     shell = SnapshotShell()
+    baseline_dets = [Grid_Z, Det_1_X, Det_1_Y, Det_1_Z]
+
+    motor_snap_shot_for_dan = {
+        k: globals()[k].read() for k in ["Grid_Z", "Det_1_X", "Det_1_Y", "Det_1_Z"]
+    }
+
+    _md.update(motor_snap_shot_for_dan)
 
     @bpp.reset_positions_decorator([fly_motor.velocity])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
+    @bpp.baseline_decorator(baseline_dets)
     @bpp.stage_decorator(dets)
     @bpp.run_decorator(md=_md)
     def inner():
@@ -220,7 +228,7 @@ def xrd_map(
                 yield from bps.mv(px_stop, stop_pos)
                 # generate the event
                 yield from bps.create("primary")
-                for obj in dets + [px_start, px_stop, step_motor]:
+                for obj in dets + [px_start, px_stop, step_motor, ring_current, fly_motor.velocity]:
                     yield from bps.read(obj)
                 yield from bps.save()
             yield from bps.checkpoint()

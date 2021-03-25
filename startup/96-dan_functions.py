@@ -8,7 +8,7 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import LiveTable
 import uuid
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 ##############
 try:
@@ -341,6 +341,8 @@ def scan_shifter_pos(
     min_dist=5,
     peak_rad=1.5,
     use_det=True,
+    abs_data = False,
+    oset_data = 0.0
 ):
     def yn_question(q):
         return input(q).lower().strip()[0] == "y"
@@ -378,6 +380,12 @@ def scan_shifter_pos(
     else:
         print("only a single point? I'm gonna quit!")
         return None
+
+    if oset_data != 0.0:
+        I_list = I_list - oset_data
+
+    if abs_data:
+        I_list = abs(I_list)
 
     print("")
     if not yn_question(
@@ -558,6 +566,9 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     I_list = np.zeros(numx)
     dx = (xmax - xmin) / numx
     pos_list = np.linspace(xmin, xmax, numx)
+    print ('moving to starting postion')
+    RE(mv(motor,pos_list[0]))
+    print ('opening shutter')
     RE(mv(fs, "Open"))
     fig1, ax1 = plt.subplots()
     use_det = True
@@ -665,3 +676,26 @@ def simple_ct(dets, exposure, *, md=None):
     plan = bp.count(dets, md=_md)
     plan = bpp.subs_wrapper(plan, LiveTable([]))
     return (yield from plan)
+
+
+def save_history(histfile,LIMIT=5000):
+    ip = get_ipython()
+    """save the IPython history to a plaintext file"""
+    #histfile = os.path.join(ip.profile_dir.location, "history.txt")
+    print("Saving plaintext history to %s" % histfile)
+    lines = []
+    # get previous lines
+    # this is only necessary because we truncate the history,
+    # otherwise we chould just open with mode='a'
+    if os.path.exists(histfile):
+        with open(histfile, 'r') as f:
+            lines = f.readlines()
+
+    # add any new lines from this session
+    lines.extend(record[2] + '\n' for record in ip.history_manager.get_range())
+
+    with open(histfile, 'w') as f:
+        # limit to LIMIT entries
+        f.writelines(lines[-LIMIT:])
+
+

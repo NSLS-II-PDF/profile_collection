@@ -44,8 +44,11 @@ except ImportError:
 
 # Make ophyd listen to pyepics.
 import logging
+import matplotlib.pyplot
 import nslsii
 import time
+import matplotlib.pyplot as plt
+
 from bluesky.utils import ts_msg_hook
 
 # See docstring for nslsii.configure_base() for more details
@@ -57,8 +60,8 @@ nslsii.configure_base(
     pbar=True,
     bec=True,
     magics=True,
-    mpl=True,
-    #publish_documents_to_kafka=True
+    mpl=False,
+    publish_documents_to_kafka=True
 )
 
 from pathlib import Path

@@ -1,49 +1,14 @@
 "Define Beamline Modes"
 def high_resolution():
 	print("Resetting white beam slits")
-	wb_slits.inboard.move(-9.6)
-	wb_slits.outboard.move(-3.542180)
+	wb_slits.inboard.move(-13.05)
+	wb_slits.outboard.move(-6.179438)
 	
 	print("Resetting Monochromator")
-	sbm.yaw.move(0.0)
-	sbm.roll.move(0.0)
-	sbm.pitch.move(-0.05799)
-	sbm.bend.move(1950)
-	sbm.twist.move(-30)
-
-	print("Resetting Mirror")
-	Mirror_VFM.y_upstream.move(-0.7)
-	Mirror_VFM.y_downstream_inboard.move(-0.0202)
-	Mirror_VFM.y_downstream_outboard.move(0.3199)
-	Mirror_VFM.bend_upstream.move(60)
-	Mirror_VFM.bend_downstream.move(60)
-
-	print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-1065)
-	ocm_slits.bottom.move(1955.0)
-	ocm_slits.outboard.move(435.959)
-	ocm_slits.inboard.move(-294.037)
-	OCM_table.upstream_jack.move(4.14225)
-	OCM_table.downstream_jack.move(-4.1700)
-	OCM_table.X.move(-8.44701)
-	print("Ready to go !")
-
-def high_flux1():
-	print("Resetting white beam slits")
-	wb_slits.inboard.move(-14.05)
-	wb_slits.outboard.move(-7.125)
-	
-	print("Resetting Monochromator")
-	sbm.yaw.move(0.0)
-	sbm.roll.move(0.0)
-	sbm.pitch.move(-0.06569)
-	sbm.bend.move(2509)
+	sbm.yaw.move(0.00013)
+	sbm.roll.move(0.00010)
+	sbm.pitch.move(-0.07137)
+	sbm.bend.move(2908.9875)
 	sbm.twist.move(0)
 
 	print("Resetting Mirror")
@@ -60,34 +25,33 @@ def high_flux1():
 	#bdm_slits.outboard.move(-4100.075)
 
 	print("Resetting OCM Slits")
-	ocm_slits.top.move(-1995)
-	ocm_slits.bottom.move(2005.0)
-	ocm_slits.outboard.move(250.959)
-	ocm_slits.inboard.move(50.963)
+	ocm_slits.top.move(3855)
+	ocm_slits.bottom.move(11105)
+	ocm_slits.outboard.move(2055.959)
+	ocm_slits.inboard.move(-1149.037)
 	OCM_table.upstream_jack.move(4.14225)
 	OCM_table.downstream_jack.move(-4.1700)
 	OCM_table.X.move(-8.44701)
 	print("Ready to go !")
 
-
-def high_flux2():
+def high_flux1(): # 10 mm Beam on Mono Ni peak saturation
 	print("Resetting white beam slits")
-	wb_slits.inboard.move(-9.36)
-	wb_slits.outboard.move(-3.473156)
+	wb_slits.inboard.move(-9.05)
+	wb_slits.outboard.move(-2.125)
 	
 	print("Resetting Monochromator")
-	sbm.yaw.move(0.0)
-	sbm.roll.move(0.0)
-	sbm.pitch.move(-0.07719)
-	sbm.bend.move(3000)
-	sbm.twist.move(0.0000)
+	sbm.yaw.move(0.00013)
+	sbm.roll.move(0.00010)
+	sbm.pitch.move(-0.13587)
+	sbm.bend.move(7708.9875)
+	sbm.twist.move(0)
 
 	print("Resetting Mirror")
-	Mirror_VFM.y_upstream.move(-0.7)
-	Mirror_VFM.y_downstream_inboard.move(-0.02)
-	Mirror_VFM.y_downstream_outboard.move(0.32)
-	Mirror_VFM.bend_upstream.move(65)
-	Mirror_VFM.bend_downstream.move(65)
+	Mirror_VFM.y_upstream.move(-0.6994)
+	Mirror_VFM.y_downstream_inboard.move(-0.019)
+	Mirror_VFM.y_downstream_outboard.move(0.3195)
+	Mirror_VFM.bend_upstream.move(50)
+	Mirror_VFM.bend_downstream.move(50)
 
 	print("Resetting BDM Slits")
 	#bdm_slits.top.move(999.957)
@@ -96,13 +60,120 @@ def high_flux2():
 	#bdm_slits.outboard.move(-4100.075)
 
 	print("Resetting OCM Slits")
-	ocm_slits.top.move(-2215.0)
-	ocm_slits.bottom.move(2295.0)
-	ocm_slits.outboard.move(380.959)
-	ocm_slits.inboard.move(-49.037)
-	OCM_table.upstream_jack.move(4.14225)
-	OCM_table.downstream_jack.move(-4.1700)
-	OCM_table.X.move(-8.44701)
+	ocm_slits.top.move(3855)
+	ocm_slits.bottom.move(11105)
+	ocm_slits.outboard.move(2055.959)
+	ocm_slits.inboard.move(-1149.037)
+	OCM_table.upstream_jack.move(1.8665)
+	OCM_table.downstream_jack.move(-4.0372500)
+	#OCM_table.X.move(-8.44701)
+	print("Ready to go !")
+
+#8mm is similar to previous
+def high_flux2(): # 8 mm Beam on Mono Ni peak 55000 cts
+	print("Resetting white beam slits")
+	wb_slits.inboard.move(-11.05)
+	wb_slits.outboard.move(-4.179438)
+	
+	print("Resetting Monochromator")
+	sbm.yaw.move(0.00013)
+	sbm.roll.move(0.00010)
+	sbm.pitch.move(-0.13587)
+	sbm.bend.move(7708.9875)
+	sbm.twist.move(0)
+
+	print("Resetting Mirror")
+	Mirror_VFM.y_upstream.move(-0.6994)
+	Mirror_VFM.y_downstream_inboard.move(-0.019)
+	Mirror_VFM.y_downstream_outboard.move(0.3195)
+	Mirror_VFM.bend_upstream.move(50)
+	Mirror_VFM.bend_downstream.move(50)
+
+	print("Resetting BDM Slits")
+	#bdm_slits.top.move(999.957)
+	#bdm_slits.bottom.move(-94363.970)
+	#bdm_slits.inboard.move(-7600.960)
+	#bdm_slits.outboard.move(-4100.075)
+
+	print("Resetting OCM Slits")
+	ocm_slits.top.move(3855)
+	ocm_slits.bottom.move(11105)
+	ocm_slits.outboard.move(2055.959)
+	ocm_slits.inboard.move(-1149.037)
+	OCM_table.upstream_jack.move(1.8665)
+	OCM_table.downstream_jack.move(-4.0372500)
+	#OCM_table.X.move(-8.44701)
+	print("Ready to go !")
+
+
+def high_flux3(): # 6 mm Beam on Mono Ni peak 40000 cts
+	print("Resetting white beam slits")
+	wb_slits.inboard.move(-12.05)
+	wb_slits.outboard.move(-5.179438)
+	
+	print("Resetting Monochromator")
+	sbm.yaw.move(0.00013)
+	sbm.roll.move(0.00010)
+	sbm.pitch.move(-0.13587)
+	sbm.bend.move(7708.9875)
+	sbm.twist.move(0)
+
+	print("Resetting Mirror")
+	Mirror_VFM.y_upstream.move(-0.6994)
+	Mirror_VFM.y_downstream_inboard.move(-0.019)
+	Mirror_VFM.y_downstream_outboard.move(0.3195)
+	Mirror_VFM.bend_upstream.move(50)
+	Mirror_VFM.bend_downstream.move(50)
+
+	print("Resetting BDM Slits")
+	#bdm_slits.top.move(999.957)
+	#bdm_slits.bottom.move(-94363.970)
+	#bdm_slits.inboard.move(-7600.960)
+	#bdm_slits.outboard.move(-4100.075)
+
+	print("Resetting OCM Slits")
+	ocm_slits.top.move(3855)
+	ocm_slits.bottom.move(11105)
+	ocm_slits.outboard.move(2055.959)
+	ocm_slits.inboard.move(-1149.037)
+	OCM_table.upstream_jack.move(1.8665)
+	OCM_table.downstream_jack.move(-4.0372500)
+	#OCM_table.X.move(-8.44701)
+	print("Ready to go !")
+
+def high_flux4(): # 4 mm Beam on Mono Ni peak 25000 cts same focus as above
+	print("Resetting white beam slits")
+	wb_slits.inboard.move(-13.05)
+	wb_slits.outboard.move(-6.179438)
+	
+	print("Resetting Monochromator")
+	sbm.yaw.move(0.00013)
+	sbm.roll.move(0.00010)
+	sbm.pitch.move(-0.13587)
+	sbm.bend.move(7708.9875)
+	sbm.twist.move(0)
+
+	print("Resetting Mirror")
+	Mirror_VFM.y_upstream.move(-0.6994)
+	Mirror_VFM.y_downstream_inboard.move(-0.019)
+	Mirror_VFM.y_downstream_outboard.move(0.3195)
+	Mirror_VFM.bend_upstream.move(50)
+	Mirror_VFM.bend_downstream.move(50)
+
+	print("Resetting BDM Slits")
+	#bdm_slits.top.move(999.957)
+	#bdm_slits.bottom.move(-94363.970)
+	#bdm_slits.inboard.move(-7600.960)
+	#bdm_slits.outboard.move(-4100.075)
+
+	print("Resetting OCM Slits")
+	ocm_slits.top.move(3855)
+	ocm_slits.bottom.move(11105)
+	ocm_slits.outboard.move(2055.959)
+	ocm_slits.inboard.move(-1149.037)
+	OCM_table.upstream_jack.move(1.8665)
+	OCM_table.downstream_jack.move(-4.0372500)
+	#OCM_table.X.move(-8.44701)
 	print("Ready to go !")
 
 def saxs():
@@ -214,6 +285,10 @@ def turbo():
         time.sleep(2)
         caput("XF:28ID1-ES:1{Env:01}Cmd-Cmd", 20)    
 
+# get direct beamcurrent
+#def I0():
+#    I0 = caget("SR:OPS-BI{DCCT:1}I:Real-I")
+
 #---------------------------function to display the dark subtracted last image ----------------------------------
 from tifffile import imread, imshow, imsave
 def lastimage(n):
@@ -222,6 +297,7 @@ def lastimage(n):
            data1=doc[1].get('data')
            if data1 != None:
                light_img=data1['pe1c_image']
+
 
     dark_uid=hdr.start. get('sc_dk_field_uid')  
     dk_hdrs=db(uid=dark_uid)
