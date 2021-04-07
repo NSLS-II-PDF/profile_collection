@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import bluesky.plan_stubs as bps
 from xpdacq.xpdacq import translate_to_sample
+import itertools
 
 
 @dataclass(frozen=True)
@@ -35,7 +36,14 @@ def move_det(x: float = None, y: float = None, z: float = None):
     Move the detector to the given (x, y, z)
 
     """
-    yield from bps.mv(Det_1_X, x, Det_1_Y, y, Det_1_Z, z)
+    args = tuple(
+        itertools.chain(
+            (m, t)
+            for m, t in zip([Det_1_X, Det_1_Y, Det_1_Z], [x, y, z])
+            if t is not None
+        )
+    )
+    yield from bps.mv(*args)
 
 
 def move_sample(x: float = None, y: float = None, z: float = None):
@@ -43,7 +51,12 @@ def move_sample(x: float = None, y: float = None, z: float = None):
     Move the detector to the given (x, y, z)
 
     """
-    yield from bps.mv(Grid_X, x, Grid_Y, y, Grid_Z, z)
+    args = tuple(
+        itertools.chain(
+            (m, t) for m, t in zip([Grid_X, Grid_Y, Grid_Z], [x, y, z]) if t is not None
+        )
+    )
+    yield from bps.mv(*args)
 
 
 def move_to_sample(name: str):
