@@ -1,8 +1,12 @@
 user_groups:
   root:  # The group includes all available plan and devices
     allowed_plans:
-      - "^move_det$"  # Allow all
-      - "^simple_ct$"
+      - "^move_to_sample$"
+      - "^move_to_det_config$"
+      - "^sample_aware_count$"
+      - "^move_det$"
+      - "^move_sample$"
+
     forbidden_plans:
       - "$_"  # All plans with names starting with '_'
     allowed_devices:
@@ -31,4 +35,3 @@ user_groups:
     forbidden_devices:
       - "^det[3-5]$" # Use regular expression patterns
       - "^motor\\d+$"
-
