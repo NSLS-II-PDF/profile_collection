@@ -105,3 +105,4 @@ RE.md.update(xrun.md)
 # insert header to db, either simulated or real
 RE.subscribe(db.insert, "all")
 RE.beamtime = bt
+RE.clear_suspenders()
