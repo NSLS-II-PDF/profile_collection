@@ -1,7 +1,8 @@
 user_groups:
   root:  # The group includes all available plan and devices
     allowed_plans:
-      - null  # Allow all
+      - "^move_det$"  # Allow all
+      - "^simple_ct$"
     forbidden_plans:
       - "$_"  # All plans with names starting with '_'
     allowed_devices:
