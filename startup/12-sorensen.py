@@ -349,7 +349,7 @@ def power_ramp_controlled(
 
     At each hold point *n_per_point* sets of xrd and pdf will be taken.  The
     hold time per temperature will be approximately
-    
+
         hold_time = (2*exposure + 70)*n_per_point
 
     Parameters
@@ -373,7 +373,7 @@ def power_ramp_controlled(
         measurements
     diagsostic_T_file : Path
         If you must.
-     """
+    """
     if ramp_uid is None:
         ramp_uid = str(uuid.uuid4())
     xrd_sample = beamtime.samples[xrd_sample_name]
@@ -523,7 +523,7 @@ def power_ramp_sequence(
 
     At each hold point *n_per_point* sets of xrd and pdf will be taken.  The
     hold time per temperature will be approximately
-    
+
         hold_time = (2*exposure + 70)*n_per_point
 
     Parameters
@@ -545,7 +545,7 @@ def power_ramp_sequence(
         measurements
     diagsostic_T_file : Path
         If you must.
-     """
+    """
     ramp_uid = str(uuid.uuid4())
     xrd_sample = beamtime.samples[xrd_sample_name]
     pdf_sample = beamtime.samples[pdf_sample_name]
@@ -693,7 +693,7 @@ def power_ramp_T_threshold(
 
     At each hold point *n_per_point* sets of xrd and pdf will be taken.  The
     hold time per temperature will be approximately
-    
+
         hold_time = (2*exposure + 70)*n_per_point
 
     Parameters
@@ -713,7 +713,7 @@ def power_ramp_T_threshold(
         measurements
     diagsostic_T_file : Path
         If you must.
-     """
+    """
     ramp_uid = str(uuid.uuid4())
     xrd_sample = beamtime.samples[xrd_sample_name]
     pdf_sample = beamtime.samples[pdf_sample_name]
