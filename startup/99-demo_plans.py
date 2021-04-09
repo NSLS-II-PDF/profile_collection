@@ -82,11 +82,11 @@ def move_to_det_config(name: str):
     )
 
 
-def sample_aware_count(dets, sample_num: int, exposure: float, *, md=None):
+def sample_aware_count(sample_num: int, exposure: float, *, md=None):
     """
     A wrapper around count that tries to mimic xpdacq.
 
     """
     _md = translate_to_sample(bt, sample_num)
     _md.update(md or {})
-    yield from simple_ct(dets, exposure, md=_md)
+    yield from simple_ct([pe1c], exposure, md=_md)
