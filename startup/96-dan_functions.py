@@ -1,3 +1,4 @@
+import time
 import sys
 from slack import WebClient
 from slack.errors import SlackApiError
@@ -8,6 +9,7 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import LiveTable
 import uuid
 import numpy as np
+
 
 
 ##############
@@ -31,12 +33,16 @@ def slack_message(my_message):
         )
     # except SlackApiError as e:
     #    assert e.response["something went wrong"]
-    except:
+    except Exception:
         print("slack message failed")
 
 
 def check_heartbeat(
-    fname="hbeat.txt", tlapse=300, send_warning=False, notify_user=False
+    fname="hbeat.txt",
+    tlapse=300,
+    send_warning=False,
+    notify_user=False,
+    user_ID="ULP5FCDDH",
 ):
     fin = open(fname, "r")
     tread = float(fin.read())
@@ -303,7 +309,7 @@ def make_me_a_dataframe(found_pos):
 
     read_xcel = pd.read_excel(my_excel_file, skiprows=1, usecols=([0, 1]))
 
-    print ('expecting length '+str(len(np.array(read_xcel.index))))
+    print("expecting length " + str(len(np.array(read_xcel.index))))
 
     df_sample_pos_info = pd.DataFrame(index=np.array(read_xcel.index))
     df_sample_pos_info["name"] = read_xcel.iloc[:, 0]
@@ -313,7 +319,6 @@ def make_me_a_dataframe(found_pos):
     df_sample_pos_info["xpdacq_scanplan_num"] = 5 * np.ones(
         len(read_xcel.index), dtype=int
     )
-
 
     return df_sample_pos_info
 
@@ -549,6 +554,7 @@ def _identify_peaks_scan_shifter_pos(
 
 def get_total_counts():
     from epics import caget
+
     return float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
 
 
