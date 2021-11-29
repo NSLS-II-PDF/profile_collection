@@ -71,8 +71,14 @@ Tomo_spinner = EpicsMotor('XF:28ID1B-ES{Smpl:Chngr-Ax:YRot}Mtr', name='Tomo_spin
 #ECS diffractometer Added by MA
 ECS_Sam_tth = EpicsMotor('XF:28ID1B-ES{ECS-Ax:2Th1}Mtr', name='ECS_Sam_tth', labels=['positioners'])
 ECS_An_tth = EpicsMotor('XF:28ID1B-ES{ECS-Ax:2Th2}Mtr', name='ECS_An_tth', labels=['positioners'])
+ECS_An_th = EpicsMotor('XF:28ID1B-ES{ECS-Ax:Th2}Mtr', name='ECS_An_th', labels=['positioners'])
 
 #detector for ECS - DO and MA
 ECS_det1 = EpicsSignalRO(  'XF:28IDC-BI:1{IM:1}:C4_1' ,name='ECS_det1')
 
+#45-degree shifting motor on M6-grid, for use with hot air blower / cryostream with angled sample bracket
+broadside45_shifter = EpicsMotor('XF:28ID1B-ES{Smpl:Array-Ax:Horiz}Mtr', name='broadside45_shifter') 
 
+#NOx BOx x/y sample position
+noxbox_x = EpicsMotor('XF:28ID1B-ES{NOx-Ax:X}Mtr', name='noxbox_x')
+noxbox_y = EpicsMotor('XF:28ID1B-ES{NOx-Ax:Y}Mtr', name='noxbox_y')

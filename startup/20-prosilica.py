@@ -57,8 +57,8 @@ class StandardProsilica(SingleTrigger, ProsilicaDetector):
 class StandardProsilicaWithTIFF(StandardProsilica):
     tiff = Cpt(TIFFPluginWithFileStore,
                suffix='TIFF1:',
-               write_path_template='/nsls2/xf28id1/psccd/%Y/%m/%d/',
-               root='/nsls2/xf28id1/psccd')
+               write_path_template='/nsls2/data/pdf/legacy/raw/psccd/%Y/%m/%d/',
+               root='/nsls2/data/pdf/legacy/raw/psccd')
 
 
 ## This renaming should be reversed: no correspondance between CSS screens, PV names and ophyd....

@@ -17,11 +17,11 @@ import os
 import yaml
 
 from xpdacq.xpdacq_conf import (
-    glbl_dict,
-    configure_device,
+    _load_beamline_config,
     _reload_glbl,
     _set_glbl,
-    _load_beamline_config,
+    configure_device,
+    glbl_dict,
 )
 
 # configure experiment device being used in current version

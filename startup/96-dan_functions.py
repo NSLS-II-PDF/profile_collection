@@ -1,7 +1,7 @@
 import time
 import sys
-from slack import WebClient
-from slack.errors import SlackApiError
+#from slack import WebClient
+#from slack.errors import SlackApiError
 import os
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
@@ -9,7 +9,7 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import LiveTable
 import uuid
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 
 ##############
@@ -24,44 +24,40 @@ else:
 ###
 
 
-def slack_message(my_message):
-    try:
-        response = client.chat_postMessage(
-            channel="pdf_dev",
-            # channel = user_name,
-            text=my_message,
-        )
-    # except SlackApiError as e:
-    #    assert e.response["something went wrong"]
-    except Exception:
-        print("slack message failed")
+#def slack_message(my_message):
+#    try:
+#        response = client.chat_postMessage(
+#            channel="pdf_dev",
+#            # channel = user_name,
+#            text=my_message,
+#        )
+#    # except SlackApiError as e:
+#    #    assert e.response["something went wrong"]
+#    except:
+#        print("slack message failed")
 
 
-def check_heartbeat(
-    fname="hbeat.txt",
-    tlapse=300,
-    send_warning=False,
-    notify_user=False,
-    user_ID="ULP5FCDDH",
-):
-    fin = open(fname, "r")
-    tread = float(fin.read())
-    tpassed = time.time() - tread
-    if tpassed > tlapse:
-        tpassed_str = str(tpassed / 60)[:3]
-        if send_warning:
-            msg_to_send = "Issue detected, no pulse in " + tpassed_str + " mins"
-            if notify_user:
-                msg_to_send = "<@" + str(user_ID) + "> " + msg_to_send
-            slack_message(msg_to_send)
-        return False
-    return True
+#def check_heartbeat(
+#    fname="hbeat.txt", tlapse=300, send_warning=False, notify_user=False
+#):
+#    fin = open(fname, "r")
+#    tread = float(fin.read())
+#    tpassed = time.time() - tread
+#    if tpassed > tlapse:
+#        tpassed_str = str(tpassed / 60)[:3]
+#        if send_warning:
+#            msg_to_send = "Issue detected, no pulse in " + tpassed_str + " mins"
+#            if notify_user:
+#                msg_to_send = "<@" + str(user_ID) + "> " + msg_to_send
+#            slack_message(msg_to_send)
+#        return False
+#    return True
 
 
-def update_heartbeat(fname="hbeat.txt"):
-    fout = open(fname, "w")
-    fout.write(str(time.time()))
-    fout.close()
+#def update_heartbeat(fname="hbeat.txt"):
+#    fout = open(fname, "w")
+#    fout.write(str(time.time()))
+#    fout.close()
 
 
 ###
@@ -296,7 +292,7 @@ def read_twocol_data(
 
 
 # setup pandas dataframe
-def make_me_a_dataframe(found_pos):
+def make_me_a_dataframe(found_pos,cut_start = None, cut_end = None):
     import glob as glob
     import pandas as pd
 
@@ -308,6 +304,10 @@ def make_me_a_dataframe(found_pos):
         return None
 
     read_xcel = pd.read_excel(my_excel_file, skiprows=1, usecols=([0, 1]))
+    if cut_start != None:
+        print ('cutting down')
+        read_xcel = read_xcel.loc[cut_start:cut_end,:]
+        read_xcel.index = range(len(read_xcel.index))
 
     print("expecting length " + str(len(np.array(read_xcel.index))))
 
@@ -346,6 +346,8 @@ def scan_shifter_pos(
     min_dist=5,
     peak_rad=1.5,
     use_det=True,
+    abs_data = False,
+    oset_data = 0.0
 ):
     def yn_question(q):
         return input(q).lower().strip()[0] == "y"
@@ -383,6 +385,12 @@ def scan_shifter_pos(
     else:
         print("only a single point? I'm gonna quit!")
         return None
+
+    if oset_data != 0.0:
+        I_list = I_list - oset_data
+
+    if abs_data:
+        I_list = abs(I_list)
 
     print("")
     if not yn_question(
@@ -560,10 +568,14 @@ def get_total_counts():
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     from epics import caget
-
+    #ensure shutter is closed
+    RE(mv(fs,"Close"))
     I_list = np.zeros(numx)
     dx = (xmax - xmin) / numx
     pos_list = np.linspace(xmin, xmax, numx)
+    print ('moving to starting postion')
+    RE(mv(motor,pos_list[0]))
+    print ('opening shutter')
     RE(mv(fs, "Open"))
     fig1, ax1 = plt.subplots()
     use_det = True
@@ -671,3 +683,114 @@ def simple_ct(dets, exposure, *, md=None):
     plan = bp.count(dets, md=_md)
     plan = bpp.subs_wrapper(plan, LiveTable([]))
     return (yield from plan)
+
+
+def save_history(histfile,LIMIT=5000):
+    ip = get_ipython()
+    """save the IPython history to a plaintext file"""
+    #histfile = os.path.join(ip.profile_dir.location, "history.txt")
+    print("Saving plaintext history to %s" % histfile)
+    lines = []
+    # get previous lines
+    # this is only necessary because we truncate the history,
+    # otherwise we chould just open with mode='a'
+    if os.path.exists(histfile):
+        with open(histfile, 'r') as f:
+            lines = f.readlines()
+
+    # add any new lines from this session
+    lines.extend(record[2] + '\n' for record in ip.history_manager.get_range())
+
+    with open(histfile, 'w') as f:
+        # limit to LIMIT entries
+        f.writelines(lines[-LIMIT:])
+
+
+
+def phase_parser(phase_str):
+    """parser for field with <chem formula>: <phase_amount>
+    Parameters
+    ----------
+    phase_str : str
+        a string contains a series of <chem formula> : <phase_amount>.
+        Each phase is separated by a comma.
+    Returns
+    -------
+    composition_dict : dict
+        a dictionary contains {element: stoichiometry}.
+    phase_dict : dict
+        a dictionary contains relative ratio of phases.
+    composition_str : str
+        a string with the format PDF transfomation software
+        takes. default is pdfgetx
+    Examples
+    --------
+    rv = cls.phase_parser('NaCl:1, Si:2')
+    rv[0] # {'Na':0.33, 'Cl':0.33, 'Si':0.67}
+    rv[1] # {'Nacl':0.33, 'Si':0.67}
+    rv[2] # 'Na0.33Cl0.5Si0.5'
+    Raises:
+    -------
+    ValueError
+        if ',' is not specified between phases
+    """
+    phase_dict = {}
+    composition_dict = {}
+    composition_str = ""
+    # figure out ratio between phases
+    compound_meta = phase_str.split(",")
+    for el in compound_meta:
+        _el = el.strip()
+        # if no ":" in the string
+        if ":" not in _el:
+            com = _el
+            amount = 1.0
+        # ":" in the string
+        else:
+            meta = _el.split(":")
+            # there is a ":" but nothing follows
+            if not meta[1]:
+                com = meta[0]
+                amount = 1.0
+            # presumably valid input
+            else:
+                com, amount = meta
+        # further verify if it's giving as 'X: 10%' format
+        if isinstance(amount, str):
+            amount = amount.strip()
+            amount = amount.replace("%", "")
+        # construct the not normalized phase dict
+        phase_dict.update({com.strip(): float(amount)})
+
+    # normalize phase ratio for composition dict
+    total = sum(phase_dict.values())
+    for k, v in phase_dict.items():
+        ratio = round(v / total, 2)
+        phase_dict[k] = ratio
+
+    # construct composition_dict
+    for k, v in phase_dict.items():
+        # k is compostring, v is phase ratio
+        try:
+            el_list, sto_list = composition_analysis(k.strip())
+        except ValueError:
+            # getx3 parser can't parse it, set default
+            el_list, sto_list = ([k], [v])
+        for el, sto in zip(el_list, sto_list):
+            # sum element
+            if el in composition_dict:
+                val = composition_dict.get(el)
+                val += sto * v
+                composition_dict.update({el: val})
+            else:
+                # otherwise, just update it
+                composition_dict.update({el: sto * v})
+
+    # finally, construct composition_str
+    for k, v in sorted(composition_dict.items()):
+        composition_str += str(k) + str(v)
+
+    return composition_dict, phase_dict, composition_str
+
+
+del pe1c.tiff.stage_sigs[pe1c.proc.reset_filter]

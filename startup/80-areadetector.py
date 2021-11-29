@@ -144,11 +144,11 @@ class XPDPerkinElmer(PerkinElmerDetector):
 
     tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
              #write_path_template='Z:/data/pe1_data/%Y/%m/%d', #- DO
-             write_path_template='Z:\\data\\pe1_data\\%Y\\%m\\%d\\', #- DO
+             write_path_template='J:\\%Y\\%m\\%d\\', #- DO
              #write_path_template='Z:/img/%Y/%m/%d/', #- MA
              #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
-             read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/', #- DO
-             root='/nsls2/xf28id1/data/pe1_data/', #-DO
+             read_path_template='/nsls2/data/pdf/legacy/raw/pe1_data/%Y/%m/%d/', #- DO
+             root='/nsls2/data/pdf/legacy/raw/pe1_data/', #-DO
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA
@@ -188,11 +188,11 @@ class XPDPerkinElmer(PerkinElmerDetector):
 class XPDPerkinElmer1(XPDPerkinElmer):
     tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
              #write_path_template='Z:/data/pe1_data/%Y/%m/%d', #- DO
-             write_path_template='Z:\\data\\pe1_data\\%Y\\%m\\%d\\', #- DO
+             write_path_template='J:\\%Y\\%m\\%d\\', #- DO
              #write_path_template='Z:/img/%Y/%m/%d/', #- MA
              #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
-             read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/', #- DO
-             root='/nsls2/xf28id1/data/pe1_data/', #-DO
+             read_path_template='/nsls2/data/pdf/legacy/raw/pe1_data/%Y/%m/%d/', #- DO
+             root='/nsls2/data/pdf/legacy/raw/pe1_data/', #-DO
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA
@@ -216,11 +216,11 @@ class XPDPerkinElmer1(XPDPerkinElmer):
 class XPDPerkinElmer2(XPDPerkinElmer):
     tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
              #write_path_template='Z:/data/pe2_data/%Y/%m/%d', #- DO
-             write_path_template='Z:\\data\\pe2_data\\%Y\\%m\\%d\\', #- DO
+             write_path_template='J:\\%Y\\%m\\%d\\', #- DO
              #write_path_template='Z:/img/%Y/%m/%d/', #- MA
              #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
-             read_path_template='/nsls2/xf28id1/data/pe2_data/%Y/%m/%d/', #- DO
-             root='/nsls2/xf28id1/data/pe2_data/', #-DO
+             read_path_template='/nsls2/data/pdf/legacy/raw/pe2_data/%Y/%m/%d/', #- DO
+             root='/nsls2/data/pdf/legacy/raw/pe2_data/', #-DO
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA

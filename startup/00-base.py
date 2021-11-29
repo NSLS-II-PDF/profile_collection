@@ -44,9 +44,16 @@ except ImportError:
 
 # Make ophyd listen to pyepics.
 import logging
+import matplotlib.pyplot
 import nslsii
 import time
+import matplotlib.pyplot as plt
+
 from bluesky.utils import ts_msg_hook
+
+#from ophyd.signal import EpicsSignalBase
+# from Tom Caswell to fix the 'None bug' - whatever that is. DO 7/9/2021
+#EpicsSignalBase.set_defaults(timeout=20)
 
 # See docstring for nslsii.configure_base() for more details
 # this command takes away much of the boilerplate for settting up a profile
@@ -57,8 +64,8 @@ nslsii.configure_base(
     pbar=True,
     bec=True,
     magics=True,
-    mpl=True,
-    #publish_documents_to_kafka=True
+    mpl=False,
+   # publish_documents_to_kafka=True
 )
 
 from pathlib import Path

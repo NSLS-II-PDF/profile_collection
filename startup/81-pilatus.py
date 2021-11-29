@@ -44,8 +44,8 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
 
     tiff = Cpt(TIFFPluginWithFileStore,
                suffix='TIFF1:',
-               write_path_template='/nsls2/xf28id1/data/pilatus300/%Y/%m/%d/',
-               root='/nsls2/xf28id1')
+               write_path_template='/nsls2/data/pdf/legacy/raw/pilatus300/%Y/%m/%d/',
+               root='/nsls2/data/pdf/legacy/raw')
 
     def setExposureTime(self, exposure_time, verbosity=3):
         self.cam.acquire_time.put(exposure_time)
