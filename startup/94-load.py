@@ -106,3 +106,6 @@ RE.md.update(xrun.md)
 RE.subscribe(db.insert, "all")
 RE.beamtime = bt
 RE.clear_suspenders()
+
+del Tramp
+del Tlist

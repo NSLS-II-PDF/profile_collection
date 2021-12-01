@@ -67,6 +67,9 @@ nslsii.configure_base(
     mpl=False,
    # publish_documents_to_kafka=True
 )
+del one_1d_step
+del one_nd_step
+del one_shot
 
 from pathlib import Path
 
