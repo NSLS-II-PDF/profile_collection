@@ -156,9 +156,9 @@ def xrd_map(
         "dimensions",
         [((f"start_{fly_motor.name}",), "primary"), ((step_motor.name,), "primary")],
     )
-    #_md["hints"].setdefault(
+    # _md["hints"].setdefault(
     #    "extents", [(fly_start, fly_stop), (step_stop, step_start)],
-    #)
+    # )
 
     # soft signal to use for tracking pixel edges
     # TODO put better metadata on these
@@ -252,7 +252,8 @@ def dark_plan(detector, shell, *, stream_name="dark"):
     # emit the event to the dark stream
     yield from bps.stage(shell)
     yield from bps.trigger_and_read(
-        [shell], name=stream_name,
+        [shell],
+        name=stream_name,
     )
     yield from bps.unstage(shell)
 

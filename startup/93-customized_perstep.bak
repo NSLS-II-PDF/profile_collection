@@ -4,7 +4,7 @@ import bluesky.preprocessors as bpp
 from itertools import cycle
 from xpdacq.xpdacq_conf import xpd_configuration, glbl_dict as glbl
 from xpdacq.beamtime import open_shutter_stub, close_shutter_stub
-from functools import partial 
+from functools import partial
 import numpy as np
 
 
@@ -41,32 +41,35 @@ and before each temperature point. So, number of darks = T_steps+1
 
 """
 
+
 def inner_expo(exposure):
     """private function to configure pe1c with continuous acquisition mode
     cs studio configuration doesn't propagate to python level
     """
-    yield from bps.abs_set(xpd_configuration["area_det"].cam.acquire_time,
-                           glbl["frame_acq_time"],wait=True,)
-    print('l50')
+    yield from bps.abs_set(
+        xpd_configuration["area_det"].cam.acquire_time,
+        glbl["frame_acq_time"],
+        wait=True,
+    )
+    print("l50")
     # compute number of frames
     acq_time = xpd_configuration["area_det"].cam.acquire_time.get()
-    print('l53')
+    print("l53")
     # _check_mini_expo(exposure, acq_time)
     num_frame = np.ceil(exposure / acq_time)
-    print('l56')
+    print("l56")
     computed_exposure = num_frame * acq_time
     yield from bps.abs_set(
         xpd_configuration["area_det"].images_per_set, num_frame, wait=True
     )
-    print('l61')
+    print("l61")
     # print exposure time
     print(
         "INFO: requested exposure time = {} - > computed exposure time"
         "= {}".format(exposure, computed_exposure)
     )
-    print('l67')
+    print("l67")
     return num_frame, acq_time, computed_exposure
-    
 
 
 def looptlist(base_temp, T_interval, T_steps):
@@ -82,17 +85,17 @@ def conditional_step(
     detectors,
     motor,
     step,
-    expo_high=60, # all in seconds
+    expo_high=60,  # all in seconds
     expo_low=600,
     wait_high=5,
     wait_low=3,
     base_temp=25,
 ):
-    """ customized step to:
-        1. open shutter
-        2. take data
-        3. close shutter
-        4. wait for equilibrium 
+    """customized step to:
+    1. open shutter
+    2. take data
+    3. close shutter
+    4. wait for equilibrium
     """
     # base case
     expo = expo_low
@@ -112,29 +115,29 @@ def conditional_step(
 
 def motor_dark_step(detectors, motor, step):
     """
-    Take darks while moving motors, wait for all to be finished before 
+    Take darks while moving motors, wait for all to be finished before
     taking light
     """
 
     yield from bps.checkpoint()
-    print('l120')
+    print("l120")
     # close the shutter
-    #yield from _close_shutter_stub() COMMENTED OUT (dark per light)
-    print('l123')
-    # move motors don't wait yet. 
+    # yield from _close_shutter_stub() COMMENTED OUT (dark per light)
+    print("l123")
+    # move motors don't wait yet.
     # Note for Soham: use `group=None` to ramp temp after dark collected
     # (Broken and replaced below) yield from bps.abs_set(motor, step, group="dark_motor")
     yield from bps.abs_set(motor, step, group="dark_motor")
-    print('l127')
-    # take dark (this has an internal wait on the readback) 
-    #yield from bps.trigger_and_read(list(detectors), name="dark") COMMENTED OUT (dark per light)
-    print('l130')
+    print("l127")
+    # take dark (this has an internal wait on the readback)
+    # yield from bps.trigger_and_read(list(detectors), name="dark") COMMENTED OUT (dark per light)
+    print("l130")
     # (Broken) now wait for the motors to be done too
     yield from bps.wait(group="dark_motor")
-    print('l133')
+    print("l133")
     # open shutter
     yield from open_shutter_stub()
-    print('l136')
+    print("l136")
     # take data
     yield from bps.trigger_and_read(list(detectors) + [motor])
-    print('l139')
+    print("l139")

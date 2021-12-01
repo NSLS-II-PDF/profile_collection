@@ -9,11 +9,12 @@ from ophyd import PVPositioner
 
 from nslsii.temperature_controllers import Eurotherm
 
+
 class CS700TemperatureController(PVPositioner):
-    readback = C(EpicsSignalRO, 'T-I')
-    setpoint = C(EpicsSignal, 'T-SP')
-    done = C(EpicsSignalRO, 'Cmd-Busy')
-    stop_signal = C(EpicsSignal, 'Cmd-Cmd')
+    readback = C(EpicsSignalRO, "T-I")
+    setpoint = C(EpicsSignal, "T-SP")
+    done = C(EpicsSignalRO, "Cmd-Busy")
+    stop_signal = C(EpicsSignal, "Cmd-Cmd")
 
     def set(self, *args, timeout=None, **kwargs):
         return super().set(*args, timeout=timeout, **kwargs)
@@ -25,6 +26,7 @@ class CS700TemperatureController(PVPositioner):
         status = DeviceStatus(self)
         status._finished()
         return status
+
 
 # To allow for sample temperature equilibration time, increase
 # the `settle_time` parameter (units: seconds).
@@ -42,54 +44,68 @@ cs700.setpoint.name = 'temperature_setpoint'
 # eurotherm.timeout.set(1200)
 # eurotherm.equilibrium_time.set(10) # commented by MA
 
-class Eurotherm(EpicsSignalPositioner):
-	def set(self, *args, **kwargs):
-		return super().set(*args, timeout=100000, **kwargs)
 
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I', write_pv='XF:28ID1-ES:1{Env:04}T-SP', tolerance = 5, name='eurotherm')
+class Eurotherm(EpicsSignalPositioner):
+    def set(self, *args, **kwargs):
+        return super().set(*args, timeout=100000, **kwargs)
+
+
+eurotherm = Eurotherm(
+    "XF:28ID1-ES:1{Env:04}T-I",
+    write_pv="XF:28ID1-ES:1{Env:04}T-SP",
+    tolerance=5,
+    name="eurotherm",
+)
+
 
 class CryoStream(Device):
     # readback
-    T = Cpt(EpicsSignalRO, 'T-I')
+    T = Cpt(EpicsSignalRO, "T-I")
     # setpoint
-    setpoint = Cpt(EpicsSignal, read_pv="T-RB",
-                   write_pv="T-SP",
-                   add_prefix=('suffix', 'read_pv', 'write_pv'))
+    setpoint = Cpt(
+        EpicsSignal,
+        read_pv="T-RB",
+        write_pv="T-SP",
+        add_prefix=("suffix", "read_pv", "write_pv"),
+    )
     # heater power level
-    heater = Cpt(EpicsSignal, ':HTR1')
+    heater = Cpt(EpicsSignal, ":HTR1")
 
     # configuration
-    dead_band = Cpt(EpicsSignal, 'T:AtSP-SP', string=True)
-    heater_range = Cpt(EpicsSignal, ':HTR1:Range', string=True)
+    dead_band = Cpt(EpicsSignal, "T:AtSP-SP", string=True)
+    heater_range = Cpt(EpicsSignal, ":HTR1:Range", string=True)
     # don't know what this is?
-    #scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
-    mode = Cpt(EpicsSignal, ':OUT1:Mode', string=True)
-    cntrl = Cpt(EpicsSignal, ':OUT1:Cntrl', string=True)
+    # scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
+    mode = Cpt(EpicsSignal, ":OUT1:Mode", string=True)
+    cntrl = Cpt(EpicsSignal, ":OUT1:Cntrl", string=True)
     # trigger signal
-    trig = Cpt(EpicsSignal, ':read.PROC')
+    trig = Cpt(EpicsSignal, ":read.PROC")
 
-    #def trigger(self):
-        #self.trig.put(1, wait=True)
-        #return DeviceStatus(self, done=True, success=True)
+    # def trigger(self):
+    # self.trig.put(1, wait=True)
+    # return DeviceStatus(self, done=True, success=True)
 
-    def __init__(self, *args, read_attrs=None,
-                 configuration_attrs=None, **kwargs):
+    def __init__(self, *args, read_attrs=None, configuration_attrs=None, **kwargs):
         if read_attrs is None:
-            read_attrs = ['T', 'setpoint']
-        #if configuration_attrs is None:
-            #configuration_attrs = ['heater_range', 'dead_band',
-                                   #'mode', 'cntrl']
-        super().__init__(*args, read_attrs=read_attrs,
-                         configuration_attrs=configuration_attrs,
-                         **kwargs)
+            read_attrs = ["T", "setpoint"]
+        # if configuration_attrs is None:
+        # configuration_attrs = ['heater_range', 'dead_band',
+        #'mode', 'cntrl']
+        super().__init__(
+            *args,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            **kwargs
+        )
         self._target = None
         self._sts = None
 
     def _sts_mon(self, value, **kwargs):
-        if (self._target is None or
-                 np.abs(self._target - value) < float(self.dead_band.get())):
+        if self._target is None or np.abs(self._target - value) < float(
+            self.dead_band.get()
+        ):
             self.T.clear_sub(self._sts_mon)
-            #self.scan.put('Passive', wait=True)
+            # self.scan.put('Passive', wait=True)
             if self._sts is not None:
                 self._sts._finished()
                 self._sts = None
@@ -97,9 +113,9 @@ class CryoStream(Device):
 
     def set(self, val):
         self._target = val
-        self.setpoint.put(val)#, wait=True)
+        self.setpoint.put(val)  # , wait=True)
         sts = self._sts = DeviceStatus(self)
-        #self.scan.put('.2 second')
+        # self.scan.put('.2 second')
         self.T.subscribe(self._sts_mon)
 
         return sts
@@ -110,55 +126,60 @@ class CryoStream(Device):
             self._sts._finished(success=success)
         self._sts = None
         self._target = None
-        #self.scan.put('Passive', wait=True)
+        # self.scan.put('Passive', wait=True)
 
 
 # TODO: uncomment later once the device is available
-cryostream = CryoStream('XF:28ID1-ES:1{Env:01}', name='cryostream')
+cryostream = CryoStream("XF:28ID1-ES:1{Env:01}", name="cryostream")
 
 
 class CryoStat1(Device):
     # readback
-    T = Cpt(EpicsSignalRO, ':IN1')
+    T = Cpt(EpicsSignalRO, ":IN1")
     # setpoint
-    setpoint = Cpt(EpicsSignal, read_pv=":OUT1:SP_RBV",
-                   write_pv=":OUT1:SP",
-                   add_prefix=('suffix', 'read_pv', 'write_pv'))
+    setpoint = Cpt(
+        EpicsSignal,
+        read_pv=":OUT1:SP_RBV",
+        write_pv=":OUT1:SP",
+        add_prefix=("suffix", "read_pv", "write_pv"),
+    )
     # heater power level
-    heater = Cpt(EpicsSignal, ':HTR1')
+    heater = Cpt(EpicsSignal, ":HTR1")
 
     # configuration
-    dead_band = Cpt(AttributeSignal, attr='_dead_band')
-    heater_range = Cpt(EpicsSignal, ':HTR1:Range', string=True)
-    scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
-    mode = Cpt(EpicsSignal, ':OUT1:Mode', string=True)
-    cntrl = Cpt(EpicsSignal, ':OUT1:Cntrl', string=True)
+    dead_band = Cpt(AttributeSignal, attr="_dead_band")
+    heater_range = Cpt(EpicsSignal, ":HTR1:Range", string=True)
+    scan = Cpt(EpicsSignal, ":read.SCAN", string=True)
+    mode = Cpt(EpicsSignal, ":OUT1:Mode", string=True)
+    cntrl = Cpt(EpicsSignal, ":OUT1:Cntrl", string=True)
     # trigger signal
-    trig = Cpt(EpicsSignal, ':read.PROC')
+    trig = Cpt(EpicsSignal, ":read.PROC")
 
     def trigger(self):
         self.trig.put(1, wait=True)
         return DeviceStatus(self, done=True, success=True)
 
-    def __init__(self, *args, dead_band, read_attrs=None,
-                 configuration_attrs=None, **kwargs):
+    def __init__(
+        self, *args, dead_band, read_attrs=None, configuration_attrs=None, **kwargs
+    ):
         if read_attrs is None:
-            read_attrs = ['T', 'setpoint']
+            read_attrs = ["T", "setpoint"]
         if configuration_attrs is None:
-            configuration_attrs = ['heater_range', 'dead_band',
-                                   'mode', 'cntrl']
-        super().__init__(*args, read_attrs=read_attrs,
-                         configuration_attrs=configuration_attrs,
-                         **kwargs)
+            configuration_attrs = ["heater_range", "dead_band", "mode", "cntrl"]
+        super().__init__(
+            *args,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            **kwargs
+        )
         self._target = None
         self._dead_band = dead_band
         self._sts = None
 
     def _sts_mon(self, value, **kwargs):
-        if (self._target is None or
-                 np.abs(self._target - value) < self._dead_band):
+        if self._target is None or np.abs(self._target - value) < self._dead_band:
             self.T.clear_sub(self._sts_mon)
-            self.scan.put('Passive', wait=True)
+            self.scan.put("Passive", wait=True)
             if self._sts is not None:
                 self._sts._finished()
                 self._sts = None
@@ -168,7 +189,7 @@ class CryoStat1(Device):
         self._target = val
         self.setpoint.put(val, wait=True)
         sts = self._sts = DeviceStatus(self)
-        self.scan.put('.2 second')
+        self.scan.put(".2 second")
         self.T.subscribe(self._sts_mon)
 
         return sts
@@ -179,50 +200,56 @@ class CryoStat1(Device):
             self._sts._finished(success=success)
         self._sts = None
         self._target = None
-        self.scan.put('Passive', wait=True)
+        self.scan.put("Passive", wait=True)
+
 
 class CryoStat2(Device):
     # readback
-    T = Cpt(EpicsSignalRO, ':IN2')
+    T = Cpt(EpicsSignalRO, ":IN2")
     # setpoint
-    setpoint = Cpt(EpicsSignal, read_pv=":OUT2:SP_RBV",
-                   write_pv=":OUT2:SP",
-                   add_prefix=('suffix', 'read_pv', 'write_pv'))
+    setpoint = Cpt(
+        EpicsSignal,
+        read_pv=":OUT2:SP_RBV",
+        write_pv=":OUT2:SP",
+        add_prefix=("suffix", "read_pv", "write_pv"),
+    )
     # heater power level
-    heater = Cpt(EpicsSignal, ':HTR2')
+    heater = Cpt(EpicsSignal, ":HTR2")
 
     # configuration
-    dead_band = Cpt(AttributeSignal, attr='_dead_band')
-    heater_range = Cpt(EpicsSignal, ':HTR2:Range', string=True)
-    scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
-    mode = Cpt(EpicsSignal, ':OUT2:Mode', string=True)
-    cntrl = Cpt(EpicsSignal, ':OUT2:Cntrl', string=True)
+    dead_band = Cpt(AttributeSignal, attr="_dead_band")
+    heater_range = Cpt(EpicsSignal, ":HTR2:Range", string=True)
+    scan = Cpt(EpicsSignal, ":read.SCAN", string=True)
+    mode = Cpt(EpicsSignal, ":OUT2:Mode", string=True)
+    cntrl = Cpt(EpicsSignal, ":OUT2:Cntrl", string=True)
     # trigger signal
-    trig = Cpt(EpicsSignal, ':read.PROC')
+    trig = Cpt(EpicsSignal, ":read.PROC")
 
     def trigger(self):
         self.trig.put(1, wait=True)
         return DeviceStatus(self, done=True, success=True)
 
-    def __init__(self, *args, dead_band, read_attrs=None,
-                 configuration_attrs=None, **kwargs):
+    def __init__(
+        self, *args, dead_band, read_attrs=None, configuration_attrs=None, **kwargs
+    ):
         if read_attrs is None:
-            read_attrs = ['T', 'setpoint']
+            read_attrs = ["T", "setpoint"]
         if configuration_attrs is None:
-            configuration_attrs = ['heater_range', 'dead_band',
-                                   'mode', 'cntrl']
-        super().__init__(*args, read_attrs=read_attrs,
-                         configuration_attrs=configuration_attrs,
-                         **kwargs)
+            configuration_attrs = ["heater_range", "dead_band", "mode", "cntrl"]
+        super().__init__(
+            *args,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            **kwargs
+        )
         self._target = None
         self._dead_band = dead_band
         self._sts = None
 
     def _sts_mon(self, value, **kwargs):
-        if (self._target is None or
-                 np.abs(self._target - value) < self._dead_band):
+        if self._target is None or np.abs(self._target - value) < self._dead_band:
             self.T.clear_sub(self._sts_mon)
-            self.scan.put('Passive', wait=True)
+            self.scan.put("Passive", wait=True)
             if self._sts is not None:
                 self._sts._finished()
                 self._sts = None
@@ -232,7 +259,7 @@ class CryoStat2(Device):
         self._target = val
         self.setpoint.put(val, wait=True)
         sts = self._sts = DeviceStatus(self)
-        self.scan.put('.2 second')
+        self.scan.put(".2 second")
         self.T.subscribe(self._sts_mon)
 
         return sts
@@ -243,22 +270,23 @@ class CryoStat2(Device):
             self._sts._finished(success=success)
         self._sts = None
         self._target = None
-        self.scan.put('Passive', wait=True)
+        self.scan.put("Passive", wait=True)
 
-cryostat1 = CryoStat1('XF:28ID1-ES1:LS335:{CryoStat}', name='cryostat1', dead_band=1)
-cryostat2 = CryoStat2('XF:28ID1-ES1:LS335:{CryoStat}', name='cryostat2', dead_band=1)
+
+cryostat1 = CryoStat1("XF:28ID1-ES1:LS335:{CryoStat}", name="cryostat1", dead_band=1)
+cryostat2 = CryoStat2("XF:28ID1-ES1:LS335:{CryoStat}", name="cryostat2", dead_band=1)
 
 # TODO : PV needs to be fixed for done signal
 # (doesn't work on ramp down)
 class LinkamFurnace(PVPositioner):
-    readback = C(EpicsSignalRO, 'TEMP')
-    setpoint = C(EpicsSignal, 'RAMP:LIMIT:SET')
-    done = C(EpicsSignalRO, 'STATUS')
-    stop_signal = C(EpicsSignal, 'RAMP:CTRL:SET')
+    readback = C(EpicsSignalRO, "TEMP")
+    setpoint = C(EpicsSignal, "RAMP:LIMIT:SET")
+    done = C(EpicsSignalRO, "STATUS")
+    stop_signal = C(EpicsSignal, "RAMP:CTRL:SET")
     temperature = C(EpicsSignal, "TEMP")
 
     def set(self, *args, timeout=None, **kwargs):
-        
+
         return super().set(*args, timeout=timeout, **kwargs)
 
     def trigger(self):
@@ -269,35 +297,42 @@ class LinkamFurnace(PVPositioner):
         status._finished()
         return status
 
+
 # To allow for sample temperature equilibration time, increase
 # the `settle_time` parameter (units: seconds).
-linkam_furnace = LinkamFurnace('XF:28ID1-ES{LINKAM}:', name='cs700',
-                                   settle_time=0)
+linkam_furnace = LinkamFurnace("XF:28ID1-ES{LINKAM}:", name="cs700", settle_time=0)
 linkam_furnace.done_value = 3
 linkam_furnace.stop_value = 0
 linkam_furnace.setpoint.kind = "normal"
 linkam_furnace.readback.kind = "normal"
-linkam_furnace.readback.name = 'temperature'
-linkam_furnace.setpoint.name = 'temperature_setpoint'
+linkam_furnace.readback.name = "temperature"
+linkam_furnace.setpoint.name = "temperature_setpoint"
 
 ## MA
 class Magnet(PVPositioner):
-    readback = Cpt(EpicsSignalRO, 'IMAG')
-    setpoint = Cpt(EpicsSignal, 'SETIPRG')
-    done = Cpt(EpicsSignalRO, 'SETI-Done1')
+    readback = Cpt(EpicsSignalRO, "IMAG")
+    setpoint = Cpt(EpicsSignal, "SETIPRG")
+    done = Cpt(EpicsSignalRO, "SETI-Done1")
 
-magnet = Magnet('XF:28ID1-ES{LS625:1}:', name='magnet')
-magnet.done_value =0
+
+magnet = Magnet("XF:28ID1-ES{LS625:1}:", name="magnet")
+magnet.done_value = 0
 #
 
 #########control voltage on eurotherm directly
-eurovolt = EpicsSignal('XF:28ID1-ES:1{Env:04}Out-SP', name='eurovolt')
+eurovolt = EpicsSignal("XF:28ID1-ES:1{Env:04}Out-SP", name="eurovolt")
 
 
 from collections import deque
 
-from ophyd import (EpicsMotor, PVPositioner, PVPositionerPC,
-                           EpicsSignal, EpicsSignalRO, Device)
+from ophyd import (
+    EpicsMotor,
+    PVPositioner,
+    PVPositionerPC,
+    EpicsSignal,
+    EpicsSignalRO,
+    Device,
+)
 from ophyd import Component as Cpt
 from ophyd import FormattedComponent as FmtCpt
 from ophyd import DynamicDeviceComponent as DDC
@@ -305,48 +340,55 @@ from ophyd import DeviceStatus, OrderedDict
 
 
 class Lakeshore336Setpoint(PVPositioner):
-    readback = Cpt(EpicsSignalRO, 'T-RB')
-    setpoint = Cpt(EpicsSignal, 'T-SP')
-    done = Cpt(EpicsSignalRO, 'Sts:Ramp-Sts')
-    ramp_enabled = Cpt(EpicsSignal, 'Enbl:Ramp-Sel')
-    ramp_rate = Cpt(EpicsSignal, 'Val:Ramp-SP')
-    p_gain = Cpt(EpicsSignal, 'Gain:P-RB', write_pv='Gain:P-SP')
-    i_gain = Cpt(EpicsSignal, 'Gain:I-RB', write_pv='Gain:I-SP')
-    d_gain = Cpt(EpicsSignal, 'Gain:D-RB', write_pv='Gain:D-SP')
+    readback = Cpt(EpicsSignalRO, "T-RB")
+    setpoint = Cpt(EpicsSignal, "T-SP")
+    done = Cpt(EpicsSignalRO, "Sts:Ramp-Sts")
+    ramp_enabled = Cpt(EpicsSignal, "Enbl:Ramp-Sel")
+    ramp_rate = Cpt(EpicsSignal, "Val:Ramp-SP")
+    p_gain = Cpt(EpicsSignal, "Gain:P-RB", write_pv="Gain:P-SP")
+    i_gain = Cpt(EpicsSignal, "Gain:I-RB", write_pv="Gain:I-SP")
+    d_gain = Cpt(EpicsSignal, "Gain:D-RB", write_pv="Gain:D-SP")
     done_value = 0
 
 
 class Lakeshore336Channel(Device):
-    T = Cpt(EpicsSignalRO, 'T-I')
-    V = Cpt(EpicsSignalRO, 'Val:Sens-I')
-    status = Cpt(EpicsSignalRO, 'T-Sts')
+    T = Cpt(EpicsSignalRO, "T-I")
+    V = Cpt(EpicsSignalRO, "Val:Sens-I")
+    status = Cpt(EpicsSignalRO, "T-Sts")
 
 
 def _temp_fields(chans, **kwargs):
     defn = OrderedDict()
     for c in chans:
-        suffix = '-Chan:{}}}'.format(c)
+        suffix = "-Chan:{}}}".format(c)
         defn[c] = (Lakeshore336Channel, suffix, kwargs)
     return defn
 
 
 class Lakeshore336(Device):
-    temp = DDC(_temp_fields(['A','B','C','D']))
-    out1 = Cpt(Lakeshore336Setpoint, '-Out:1}')
-    out2 = Cpt(Lakeshore336Setpoint, '-Out:2}')
-    out3 = Cpt(Lakeshore336Setpoint, '-Out:3}')
-    out4 = Cpt(Lakeshore336Setpoint, '-Out:4}')                             
+    temp = DDC(_temp_fields(["A", "B", "C", "D"]))
+    out1 = Cpt(Lakeshore336Setpoint, "-Out:1}")
+    out2 = Cpt(Lakeshore336Setpoint, "-Out:2}")
+    out3 = Cpt(Lakeshore336Setpoint, "-Out:3}")
+    out4 = Cpt(Lakeshore336Setpoint, "-Out:4}")
 
 
-lakeshore336 = Lakeshore336('XF:28ID1-ES{LS336:1' , name='lakeshore336')
+lakeshore336 = Lakeshore336("XF:28ID1-ES{LS336:1", name="lakeshore336")
 
-hotairblower=Eurotherm('XF:28ID1-ES:1{Env:05}LOOP1:PV:RBV',
-        write_pv='XF:28ID1-ES:1{Env:05}LOOP1:SP',
-        tolerance=1,name='hotairblower')
+hotairblower = Eurotherm(
+    "XF:28ID1-ES:1{Env:05}LOOP1:PV:RBV",
+    write_pv="XF:28ID1-ES:1{Env:05}LOOP1:SP",
+    tolerance=1,
+    name="hotairblower",
+)
 
-#older hot air blower
-#hotairblower=Eurotherm('XF:28ID1-ES:1{Env:03}T-I',
+# older hot air blower
+# hotairblower=Eurotherm('XF:28ID1-ES:1{Env:03}T-I',
 #        write_pv='XF:28ID1-ES:1{Env:03}T-SP',
 #        tolerance=1,name='hotairblower')
 
-sorensen850_manual = EpicsSignal('XF:28ID1-ES{LS336:1-Out:3}Out:Man-RB', write_pv='XF:28ID1-ES{LS336:1-Out:3}Out:Man-SP', name='sorensen850_manual')
+sorensen850_manual = EpicsSignal(
+    "XF:28ID1-ES{LS336:1-Out:3}Out:Man-RB",
+    write_pv="XF:28ID1-ES{LS336:1-Out:3}Out:Man-SP",
+    name="sorensen850_manual",
+)

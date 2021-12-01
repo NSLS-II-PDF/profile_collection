@@ -1,7 +1,8 @@
 import time
 import sys
-#from slack import WebClient
-#from slack.errors import SlackApiError
+
+# from slack import WebClient
+# from slack.errors import SlackApiError
 import os
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
@@ -26,7 +27,7 @@ else:
 ###
 
 
-#def slack_message(my_message):
+# def slack_message(my_message):
 #    try:
 #        response = client.chat_postMessage(
 #            channel="pdf_dev",
@@ -39,9 +40,9 @@ else:
 #        print("slack message failed")
 
 
-#def check_heartbeat(
+# def check_heartbeat(
 #    fname="hbeat.txt", tlapse=300, send_warning=False, notify_user=False
-#):
+# ):
 #    fin = open(fname, "r")
 #    tread = float(fin.read())
 #    tpassed = time.time() - tread
@@ -56,7 +57,7 @@ else:
 #    return True
 
 
-#def update_heartbeat(fname="hbeat.txt"):
+# def update_heartbeat(fname="hbeat.txt"):
 #    fout = open(fname, "w")
 #    fout.write(str(time.time()))
 #    fout.close()
@@ -96,9 +97,13 @@ def show_me_db(
         if "sc_dk_field_uid" in db[my_id].start.keys():
             my_dark_id = db[my_id].start["sc_dk_field_uid"]
             if new_db:
-                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+                dark_im = (
+                    db[my_dark_id].table(fill=True)[my_det_probably][1][0]
+                ).astype(float)
             else:
-                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(
+                    float
+                )
 
             my_im = my_im - dark_im
         else:
@@ -301,7 +306,7 @@ def read_twocol_data(
 
 
 # setup pandas dataframe
-def make_me_a_dataframe(found_pos,cut_start = None, cut_end = None):
+def make_me_a_dataframe(found_pos, cut_start=None, cut_end=None):
     import glob as glob
     import pandas as pd
 
@@ -314,8 +319,8 @@ def make_me_a_dataframe(found_pos,cut_start = None, cut_end = None):
 
     read_xcel = pd.read_excel(my_excel_file, skiprows=1, usecols=([0, 1]))
     if cut_start != None:
-        print ('cutting down')
-        read_xcel = read_xcel.loc[cut_start:cut_end,:]
+        print("cutting down")
+        read_xcel = read_xcel.loc[cut_start:cut_end, :]
         read_xcel.index = range(len(read_xcel.index))
 
     print("expecting length " + str(len(np.array(read_xcel.index))))
@@ -355,9 +360,9 @@ def scan_shifter_pos(
     min_dist=5,
     peak_rad=1.5,
     use_det=True,
-    abs_data = False,
-    oset_data = 0.0,
-    return_to_start = True
+    abs_data=False,
+    oset_data=0.0,
+    return_to_start=True,
 ):
     def yn_question(q):
         return input(q).lower().strip()[0] == "y"
@@ -399,9 +404,8 @@ def scan_shifter_pos(
         return None
 
     if return_to_start:
-        print ('returning to start position....')
+        print("returning to start position....")
         motor.move(init_pos)
-
 
     if oset_data != 0.0:
         I_list = I_list - oset_data
@@ -585,14 +589,15 @@ def get_total_counts():
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     from epics import caget
-    #ensure shutter is closed
-    RE(mv(fs,"Close"))
+
+    # ensure shutter is closed
+    RE(mv(fs, "Close"))
     I_list = np.zeros(numx)
     dx = (xmax - xmin) / numx
     pos_list = np.linspace(xmin, xmax, numx)
-    print ('moving to starting postion')
-    RE(mv(motor,pos_list[0]))
-    print ('opening shutter')
+    print("moving to starting postion")
+    RE(mv(motor, pos_list[0]))
+    print("opening shutter")
     RE(mv(fs, "Open"))
     time.sleep(1)
     fig1, ax1 = plt.subplots()
@@ -703,26 +708,25 @@ def simple_ct(dets, exposure, *, md=None):
     return (yield from plan)
 
 
-def save_history(histfile,LIMIT=5000):
+def save_history(histfile, LIMIT=5000):
     ip = get_ipython()
     """save the IPython history to a plaintext file"""
-    #histfile = os.path.join(ip.profile_dir.location, "history.txt")
+    # histfile = os.path.join(ip.profile_dir.location, "history.txt")
     print("Saving plaintext history to %s" % histfile)
     lines = []
     # get previous lines
     # this is only necessary because we truncate the history,
     # otherwise we chould just open with mode='a'
     if os.path.exists(histfile):
-        with open(histfile, 'r') as f:
+        with open(histfile, "r") as f:
             lines = f.readlines()
 
     # add any new lines from this session
-    lines.extend(record[2] + '\n' for record in ip.history_manager.get_range())
+    lines.extend(record[2] + "\n" for record in ip.history_manager.get_range())
 
-    with open(histfile, 'w') as f:
+    with open(histfile, "w") as f:
         # limit to LIMIT entries
         f.writelines(lines[-LIMIT:])
-
 
 
 def phase_parser(phase_str):
