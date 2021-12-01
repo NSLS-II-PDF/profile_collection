@@ -11,6 +11,8 @@ import uuid
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.ion()
+
 
 ##############
 try:
@@ -79,18 +81,25 @@ def show_me_db(
     dark_subtract=True,
     return_im=False,
     return_dark=False,
+    new_db=False,
 ):
     my_det_probably = db[my_id].start["detectors"][0] + "_image"
-    my_im = (db[my_id].table(fill=True)[my_det_probably][1]).astype(float)
+    if new_db:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+    else:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1]).astype(float)
+
     if len(my_im) == 0:
         print("issue... passing")
         pass
     if dark_subtract:
         if "sc_dk_field_uid" in db[my_id].start.keys():
             my_dark_id = db[my_id].start["sc_dk_field_uid"]
-            dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(
-                float
-            )
+            if new_db:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+            else:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
+
             my_im = my_im - dark_im
         else:
             print("this run has no associated dark")
@@ -347,10 +356,13 @@ def scan_shifter_pos(
     peak_rad=1.5,
     use_det=True,
     abs_data = False,
-    oset_data = 0.0
+    oset_data = 0.0,
+    return_to_start = True
 ):
     def yn_question(q):
         return input(q).lower().strip()[0] == "y"
+
+    init_pos = motor.position
 
     print("")
     print("I'm going to move the motor: " + str(motor.name))
@@ -385,6 +397,11 @@ def scan_shifter_pos(
     else:
         print("only a single point? I'm gonna quit!")
         return None
+
+    if return_to_start:
+        print ('returning to start position....')
+        motor.move(init_pos)
+
 
     if oset_data != 0.0:
         I_list = I_list - oset_data
@@ -577,6 +594,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     RE(mv(motor,pos_list[0]))
     print ('opening shutter')
     RE(mv(fs, "Open"))
+    time.sleep(1)
     fig1, ax1 = plt.subplots()
     use_det = True
     for i, pos in enumerate(pos_list):

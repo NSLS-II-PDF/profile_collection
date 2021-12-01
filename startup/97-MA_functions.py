@@ -295,3 +295,13 @@ def Cryostat_CF(t, settle_time): # rounds up the setpoint to a integer thres
 	time.sleep(settle_time)
 
 	
+#---------------------------------HAB T setpoint threshold--------------------------------------------
+def Humidity_set(a, b, threshold, settle_time):
+	RE(flow(a,b))
+	H = readRH
+	H_now = readRH(verbosity=2)
+
+	while H_now not in range(H-threshold, H+2*threshold):
+		H_now = readRH(verbosity=2)
+		time.sleep(0.5)
+	time.sleep(settle_time)
