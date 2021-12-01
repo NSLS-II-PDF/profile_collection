@@ -1,5 +1,6 @@
 from bluesky.utils import short_uid
 
+
 def future_count(detectors, num=1, delay=None, *, per_shot=None, md=None):
     """
     Take one or more readings from detectors.
@@ -145,18 +146,17 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
     @bpp.reset_positions_decorator([motor.velocity])
     def per_shot(dets):
         nonlocal start, stop
-        yield from bps.mv(motor, start) # got to initial position
-        yield from bps.mv(motor.velocity, abs(stop - start) / exposure) # set velocity
+        yield from bps.mv(motor.velocity, abs(stop - start) / exposure)  # set velocity
         gp = short_uid("rocker")
-        yield from bps.abs_set(motor, stop, group=gp) # set motor to move towards end
-        yield from bps.trigger_and_read(dets) # collect off detector
+        yield from bps.abs_set(motor, stop, group=gp)  # set motor to move towards end
+        yield from bps.trigger_and_read(dets)  # collect off detector
         yield from bps.wait(group=gp)
         start, stop = stop, start
 
+    yield from bps.mv(motor, start)  # got to initial position
     return (yield from future_count(dets, md=_md, per_shot=per_shot, num=num))
 
-def jog(exposure_s, motor, start, stop):
-    """ pass total exposure time (in seconds), motor name (i.e. Grid_Y), start and stop positions for the motor."""
-    yield from rocking_ct([pe1c], exposure_s, motor, start, stop)
-        
 
+def jog(exposure_s, motor, start, stop):
+    """pass total exposure time (in seconds), motor name (i.e. Grid_Y), start and stop positions for the motor."""
+    yield from rocking_ct([pe1c], exposure_s, motor, start, stop)
