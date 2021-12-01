@@ -5,6 +5,7 @@ import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 
 
+
 def future_count(detectors, num=1, delay=None, *, per_shot=None, md=None):
     """
     Take one or more readings from detectors.
@@ -97,7 +98,6 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
     @bpp.reset_positions_decorator([motor.velocity])
     def per_shot(dets):
         nonlocal start, stop
-        yield from bps.mv(motor, start)  # got to initial position
         yield from bps.mv(motor.velocity, abs(stop - start) / exposure)  # set velocity
         gp = short_uid("rocker")
         yield from bps.abs_set(motor, stop, group=gp)  # set motor to move towards end
@@ -105,6 +105,7 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
         yield from bps.wait(group=gp)
         start, stop = stop, start
 
+    yield from bps.mv(motor, start)  # got to initial position
     return (yield from future_count(dets, md=_md, per_shot=per_shot, num=num))
 
 
