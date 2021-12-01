@@ -6,6 +6,7 @@ user_groups:
       - "^sample_aware_count$"
       - "^move_det$"
       - "^move_sample$"
+      - "^pdf_count$"
 
     forbidden_plans:
       - "$_"  # All plans with names starting with '_'
