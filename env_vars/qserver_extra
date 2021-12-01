@@ -1,0 +1,2 @@
+export PYTHONPATH=/home/xf28id1/python_overlay/lib/python3.9/site-packages/
+export QSERVER_STARTUP_DIR=/nsls2/data/pdf/shared/config/profile_collection/startup
