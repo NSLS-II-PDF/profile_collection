@@ -23,10 +23,10 @@ SAMPLE_POSITONS = {
 
 DETECTOR_POSITIONS = {
     "near": DetectorConfiguration(
-        beamstop_x=-17.02152375, beamstop_y=0.717885, detector=3857.0
+        beamstop_x=-16.44653, beamstop_y=3.7878875, detector=3700.0
     ),
     "far": DetectorConfiguration(
-        beamstop_x=-16.541525, beamstop_y=0.437885, detector=4973.0
+        beamstop_x=-16.44653, beamstop_y=3.7878875, detector=4700.0
     ),
 }
 
