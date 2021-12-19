@@ -89,6 +89,13 @@ class PDFFastShutter(Device):
         d[self.name] = {'value': self.get(), 'timestamp': time.time()}
         return d
 
+    def describe(self):
+        d = super().describe()
+        d[self.name] = {'source': self.cmd.pvname,
+                        'dtype': str,
+                        'shape': []}
+        return d
+
     # def stop(self, success=False):
     #     return self.set('Close')
 
@@ -134,6 +141,6 @@ class OCMTable(Device):
     upstream_jack = Cpt(EpicsMotor, 'YU}Mtr')
     downstream_jack = Cpt(EpicsMotor, 'YD}Mtr')
     X = Cpt(EpicsMotor, 'X}Mtr')
- 
+
 OCM_table = OCMTable(prefix="XF:28ID1B-ES{OCM-Ax:",
                                   name="optics_table")
