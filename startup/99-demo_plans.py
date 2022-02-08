@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import bluesky.plan_stubs as bps
-from xpdacq.xpdacq import translate_to_sample
+from xpdacq.xpdacq import translate_to_sample as get_metadata_for_sample_number
 import itertools
 
 
@@ -87,7 +87,7 @@ def sample_aware_count(sample_num: int, exposure: float, *, md=None):
     A wrapper around count that tries to mimic xpdacq.
 
     """
-    _md = translate_to_sample(bt, sample_num)
+    _md = get_metadata_for_sample_number(bt, sample_num)
     _md.update(md or {})
     yield from simple_ct([pe1c], exposure, md=_md)
 
@@ -143,7 +143,7 @@ def _pdf_count(
 ):
     # sample_db = _refresh_sample_database()
     sample_info = sample_db[sample_number]
-    _md = translate_to_sample(bt, sample_info["xpdacq_number"])
+    _md = get_metadata_for_sample_number(bt, sample_info["xpdacq_number"])
     _md["sample_info"] = sample_info
     _md.update(md or {})
 
