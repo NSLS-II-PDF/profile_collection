@@ -350,7 +350,7 @@ class PerkinElmerMulti1(MultiTrigger, XPDPerkinElmer1):
     shutter = C(EpicsSignal, "XF:28IDC-ES:1{Sh:Exp}Cmd-Cmd")
 
 
-class PerkinElmerContinuous2(ContinuousAcquisitionTrigger, XPDPerkinElmer):
+class PerkinElmerContinuous2(ContinuousAcquisitionTrigger, XPDPerkinElmer2):
     pass
 
 
@@ -375,19 +375,16 @@ pe1 = PerkinElmerStandard1("XF:28ID1-ES{Det:PE1}", name="pe1", read_attrs=["tiff
 #################
 
 
-# temporary disable detector for PE2 testing -MA 11/25/19
-pe1c = PerkinElmerContinuous1(
-    "XF:28ID1-ES{Det:PE1}",
-    name="pe1c",
-    read_attrs=["tiff", "stats1.total"],
-    plugin_name="tiff",
-)
+#temporary disable detector for PE2 testing -MA 11/25/19 and 12/09/21
+pe1c = PerkinElmerContinuous1('XF:28ID1-ES{Det:PE1}', name='pe1c',
+                             read_attrs=['tiff', 'stats1.total'],
+                             plugin_name='tiff')
 ################
 
 
 ################
-# enabled by MA during PE2 detector testing - 11/25/2019
-# pe1c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe1c',
+#enabled by MA during PE2 detector testing - 11/25/2019 and 12/09/21
+#pe1c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe1c',
 #                             read_attrs=['tiff', 'stats1.total'],
 #                             plugin_name='tiff')
 #################

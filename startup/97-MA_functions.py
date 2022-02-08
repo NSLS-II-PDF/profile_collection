@@ -331,11 +331,23 @@ def Cryostat_CF(t, settle_time):  # rounds up the setpoint to a integer thres
 
 # ---------------------------------HAB T setpoint threshold--------------------------------------------
 def Humidity_set(a, b, threshold, settle_time):
-    RE(flow(a, b))
-    H = readRH
-    H_now = readRH(verbosity=2)
+	RE(flow(a,b))
+	H = readRH
+	H_now = readRH(verbosity=2)
 
-    while H_now not in range(H - threshold, H + 2 * threshold):
-        H_now = readRH(verbosity=2)
-        time.sleep(0.5)
-    time.sleep(settle_time)
+	while H_now not in range(H-threshold, H+2*threshold):
+		H_now = readRH(verbosity=2)
+		time.sleep(0.5)
+	time.sleep(settle_time)
+
+#---------------------------------Reaction cell--------------------------------------------
+'''
+def HAB_Tset(t, threshold, settle_time):
+	caput("Set point PV", t)
+	T_now = caget("Readback PV")
+
+	while T_now not in range(t-threshold, t+2*threshold):
+		T_now = caget("Readback PV")
+		time.sleep(0.5)
+	time.sleep(settle_time)
+'''

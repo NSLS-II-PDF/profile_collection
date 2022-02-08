@@ -1,6 +1,10 @@
 "Define motors related to optics"
+import time as ttime
+
 from ophyd.status import SubscriptionStatus
 from ophyd import Signal
+from ophyd.sim import NullStatus
+
 
 
 class Slits(Device):
@@ -77,21 +81,22 @@ class PDFFastShutter(Device):
         self.readmap = {0: "Open", 1: "Close"}
 
     def set(self, val):
-        def check_if_done(value, old_value, **kwargs):
-            if (val in ["Open", 1] and value == 0) or (
-                val in ["Close", 0] and value == 1
-            ):
-                if self.st is not None:
-                    self.st._finished()
-                    self.st = None
-                return True
-            return False
-
+        # NOTE: temporary workaround until the fast shutter works.
+        #
+        # def check_if_done(value, old_value, **kwargs):
+        #     if ((val in ['Open', 1] and value == 0) or
+        #         (val in ['Close', 0] and value == 1)):
+        #         if self.st is not None:
+        #             self.st._finished()
+        #             self.st = None
+        #         return True
+        #     return False
         self.cmd.set(self.setmap[val])
-        status = SubscriptionStatus(
-            self.status, check_if_done, settle_time=self.settle_time.get()
-        )
-        return status
+        # status = SubscriptionStatus(self.status, check_if_done,settle_time=self.settle_time.get())
+        # return status
+
+        ttime.sleep(1.0)  # wait to set the value since the status PV does not capture the actual status
+        return NullStatus()
 
     def get(self):
         return self.readmap[self.cmd.get()]

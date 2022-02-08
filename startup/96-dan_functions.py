@@ -585,6 +585,7 @@ def get_total_counts():
     from epics import caget
 
     return float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
+    #return float(caget("XF:28ID1-ES{Det:PE2}Stats1:Total_RBV")) #for pe2c
 
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
