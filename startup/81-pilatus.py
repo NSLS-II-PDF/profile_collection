@@ -101,9 +101,8 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
         # self.cam.num_images = num_images
 
 
-pilatus1 = PilatusV33('XF:28ID1-ES{Det:Pilatus}', name='pilatus1')
-# pilatus1.tiff.read_attrs = []
-pilatus1.tiff.kind = 'normal'
+# pilatus300 = PilatusV33("XF:28ID1-ES{Det:PIL3X}:", name="pilatus300")
+# pilatus300.tiff.read_attrs = []
 
 
 
