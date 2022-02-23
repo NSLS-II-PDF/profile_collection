@@ -1,13 +1,16 @@
 import time as ttime
 from ophyd.areadetector import (
-    PerkinElmerDetector,
-    ImagePlugin,
-    TIFFPlugin,
-    HDF5Plugin,
-    ProcessPlugin,
-    ROIPlugin,
+    DetectorBase as _PerkinElmerDetector)
+from ophyd.areadetector.plugins import (
+    ImagePlugin_V34 as ImagePlugin,
+    TIFFPlugin_V34 as TIFFPlugin,
+    HDF5Plugin_V34 as HDF5Plugin,
+    ProcessPlugin_V34 as ProcessPlugin,
+    ROIPlugin_V34 as ROIPlugin,
+    StatsPlugin_V34 as StatsPlugin
 )
-from ophyd.device import BlueskyInterface
+from ophyd.areadetector.cam import CamBase as _PerkinElmerDetectorCam
+from ophyd.device import BlueskyInterface, Component as Cpt
 from ophyd.areadetector.trigger_mixins import SingleTrigger, MultiTrigger
 from ophyd.areadetector.filestore_mixins import (
     FileStoreIterativeWrite,
@@ -19,7 +22,16 @@ from ophyd import Signal, EpicsSignal, EpicsSignalRO  # Tim test
 from ophyd import Component as C, Device, DeviceStatus
 from ophyd import StatusBase
 
-from nslsii.ad33 import StatsPluginV33
+
+
+class PerkinElmerDetectorCam(_PerkinElmerDetectorCam):
+    pool_max_buffers = None
+    pe_dwell_time = None
+    pe_sync_time = None
+    pe_system_id = None
+
+class PerkinElmerDetector(_PerkinElmerDetector):
+    cam = Cpt(PerkinElmerDetectorCam, 'cam1:')
 
 # from shutter import sh1
 
@@ -173,17 +185,17 @@ class XPDPerkinElmer(PerkinElmerDetector):
     images_per_set = C(Signal, value=1, add_prefix=())
     number_of_sets = C(Signal, value=1, add_prefix=())
 
-    stats1 = C(StatsPluginV33, "Stats1:")
-    stats2 = C(StatsPluginV33, "Stats2:")
-    stats3 = C(StatsPluginV33, "Stats3:")
-    stats4 = C(StatsPluginV33, "Stats4:")
-    stats5 = C(StatsPluginV33, "Stats5:")
+    stats1 = C(StatsPlugin, "Stats1:")
+    stats2 = C(StatsPlugin, "Stats2:")
+    stats3 = C(StatsPlugin, "Stats3:")
+    stats4 = C(StatsPlugin, "Stats4:")
+    stats5 = C(StatsPlugin, "Stats5:")
 
     roi1 = C(ROIPlugin, "ROI1:")
     roi2 = C(ROIPlugin, "ROI2:")
     roi3 = C(ROIPlugin, "ROI3:")
     roi4 = C(ROIPlugin, "ROI4:")
-
+ 
     # dark_image = C(SavedImageSignal, None)
 
     def __init__(self, *args, **kwargs):

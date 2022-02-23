@@ -14,10 +14,11 @@ from ophyd import (
     TransformPlugin,
     ProcessPlugin,
     PilatusDetector,
-    PilatusDetectorCam,
-    StatsPlugin,
+    PilatusDetectorCam)
+from ophyd.areadetector.plugins import (
+    StatsPlugin_V34 as StatsPlugin
 )
-from nslsii.ad33 import SingleTriggerV33, StatsPluginV33
+from nslsii.ad33 import SingleTriggerV33
 
 
 class TIFFPluginWithFileStore(TIFFPlugin, FileStoreTIFFIterativeWrite):
@@ -44,11 +45,11 @@ class PilatusDetectorCamV33(PilatusDetectorCam):
 class PilatusV33(SingleTriggerV33, PilatusDetector):
     cam = Cpt(PilatusDetectorCamV33, "cam1:")
     image = Cpt(ImagePlugin, "image1:")
-    #    stats1 = Cpt(StatsPluginV33, 'Stats1:')
-    #    stats2 = Cpt(StatsPluginV33, 'Stats2:')
-    #    stats3 = Cpt(StatsPluginV33, 'Stats3:')
-    #    stats4 = Cpt(StatsPluginV33, 'Stats4:')
-    #    stats5 = Cpt(StatsPluginV33, 'Stats5:')
+    #    stats1 = Cpt(StatsPlugin, 'Stats1:')
+    #    stats2 = Cpt(StatsPlugin, 'Stats2:')
+    #    stats3 = Cpt(StatsPlugin, 'Stats3:')
+    #    stats4 = Cpt(StatsPlugin, 'Stats4:')
+    #    stats5 = Cpt(StatsPlugin, 'Stats5:')
     #    roi1 = Cpt(ROIPlugin, 'ROI1:')
     #    roi2 = Cpt(ROIPlugin, 'ROI2:')
     #    roi3 = Cpt(ROIPlugin, 'ROI3:')
