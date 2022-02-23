@@ -1,13 +1,25 @@
 from ophyd import Component as Cpt
 from ophyd import Signal
 
-from ophyd import (SingleTrigger,
-                   TIFFPlugin, ImagePlugin, DetectorBase,
-                   HDF5Plugin, AreaDetector, EpicsSignal, EpicsSignalRO,
-                   ROIPlugin, TransformPlugin, ProcessPlugin, PilatusDetector, 
-		           PilatusDetectorCam, StatsPlugin)
+from ophyd import (
+    SingleTrigger,
+    TIFFPlugin,
+    ImagePlugin,
+    DetectorBase,
+    HDF5Plugin,
+    AreaDetector,
+    EpicsSignal,
+    EpicsSignalRO,
+    ROIPlugin,
+    TransformPlugin,
+    ProcessPlugin,
+    PilatusDetector,
+    PilatusDetectorCam)
 from ophyd.areadetector.filestore_mixins import FileStoreTIFFIterativeWrite
-from nslsii.ad33 import SingleTriggerV33, StatsPluginV33
+from ophyd.areadetector.plugins import (
+    StatsPlugin_V34 as StatsPlugin
+)
+from nslsii.ad33 import SingleTriggerV33
 from collections import OrderedDict
 
 
@@ -61,28 +73,29 @@ class PilatusDetectorCamV33(PilatusDetectorCam):
 
 
 class PilatusV33(SingleTriggerV33, PilatusDetector):
-    cam = Cpt(PilatusDetectorCamV33, 'cam1:')
-    #stats1 = Cpt(StatsPluginV33, 'Stats1:')
-    #stats2 = Cpt(StatsPluginV33, 'Stats2:')
-    #stats3 = Cpt(StatsPluginV33, 'Stats3:')
-    #stats4 = Cpt(StatsPluginV33, 'Stats4:')
-    #stats5 = Cpt(StatsPluginV33, 'Stats5:')
-    #roi1 = Cpt(ROIPlugin, 'ROI1:')
-    #roi2 = Cpt(ROIPlugin, 'ROI2:')
-    #roi3 = Cpt(ROIPlugin, 'ROI3:')
-    #roi4 = Cpt(ROIPlugin, 'ROI4:')
-    #proc1 = Cpt(ProcessPlugin, 'Proc1:')
+    cam = Cpt(PilatusDetectorCamV33, "cam1:")
+    image = Cpt(ImagePlugin, "image1:")
+    #    stats1 = Cpt(StatsPlugin, 'Stats1:')
+    #    stats2 = Cpt(StatsPlugin, 'Stats2:')
+    #    stats3 = Cpt(StatsPlugin, 'Stats3:')
+    #    stats4 = Cpt(StatsPlugin, 'Stats4:')
+    #    stats5 = Cpt(StatsPlugin, 'Stats5:')
+    #    roi1 = Cpt(ROIPlugin, 'ROI1:')
+    #    roi2 = Cpt(ROIPlugin, 'ROI2:')
+    #    roi3 = Cpt(ROIPlugin, 'ROI3:')
+    #    roi4 = Cpt(ROIPlugin, 'ROI4:')
+    #    proc1 = Cpt(ProcessPlugin, 'Proc1:')
 
     tiff = Cpt(TIFFPluginWithFileStore,
                suffix='TIFF1:',
                write_path_template='/nsls2/data/pdf/legacy/raw/pilatus1_data/%Y/%m/%d/',
                root='/nsls2/data/pdf/legacy/raw')
-    
+
     def set_exposure_time(self, exposure_time, verbosity=3):
         yield from bps.mv(self.cam.acquire_time, exposure_time, self.cam.acquire_period, exposure_time+.1)
         # self.cam.acquire_time.put(exposure_time)
         # self.cam.acquire_period.put(exposure_time+.1)
-    
+
     def set_num_images(self, num_images):
         yield from bps.mv(self.cam.num_images, num_images)
         # self.cam.num_images = num_images
@@ -134,7 +147,7 @@ def show_me_db2(
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
             else:
                 dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
-    
+
             my_im = my_im - dark_im
         else:
             print("this run has no associated dark")
@@ -142,7 +155,7 @@ def show_me_db2(
         return my_im
     if return_dark:
         return dark_im
-    
+
     #if all else fails, plot!
     show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
 
