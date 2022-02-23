@@ -68,8 +68,8 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
         self.cam.acquire_period.put(exposure_time + 0.1)
 
 
-pilatus300 = PilatusV33("XF:28ID1-ES{Det:PIL3X}:", name="pilatus300")
-pilatus300.tiff.read_attrs = []
+# pilatus300 = PilatusV33("XF:28ID1-ES{Det:PIL3X}:", name="pilatus300")
+# pilatus300.tiff.read_attrs = []
 
 # pilatus300.stats3.total.kind = 'hinted'
 # pilatus300.stats4.total.kind = 'hinted'
