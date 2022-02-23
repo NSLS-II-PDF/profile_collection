@@ -192,3 +192,6 @@ def pdf_count(sample_number: int, exposure_time: float, *, md: dict = {}):
         bt=bt,
         dets=[pe1c],
     )
+
+def take_a_nap(delay: float):
+    yield from bps.sleep(delay)
