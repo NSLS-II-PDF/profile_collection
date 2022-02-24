@@ -142,7 +142,17 @@ def take_dark(cam, light_field, dark_field_name):
     df_sig.stashed_datakey = desc[light_field]
 
 
-class XPDTIFFPlugin(TIFFPlugin, FileStoreTIFFSquashing, FileStoreIterativeWrite):
+class XPDFileStoreTIFFSquashing(FileStoreTIFFSquashing):
+    def describe(self):
+        description = super().describe()
+        shape = list(description["pe1c_image"]["shape"])
+        shape[0] = self.get_frames_per_point()
+        shape = tuple(shape)
+        description["pe1c_image"]["shape"] = shape
+        return description
+
+
+class XPDTIFFPlugin(TIFFPlugin, XPDFileStoreTIFFSquashing, FileStoreIterativeWrite):
     pass
 
 
