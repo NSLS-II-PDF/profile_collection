@@ -69,14 +69,9 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
         yield from bps.mv(self.cam.num_images, num_images)
         # self.cam.num_images = num_images
 
-pilatus1 = PilatusV33('XF:28ID1-ES{Det:Pilatus}', name='pilatus1_data')
-pilatus1.tiff.read_attrs = []
-pilatus1.tiff.kind = 'normal'
-
-
-
-# pilatus300 = PilatusV33("XF:28ID1-ES{Det:PIL3X}:", name="pilatus300")
-# pilatus300.tiff.read_attrs = []
+# pilatus1 = PilatusV33('XF:28ID1-ES{Det:Pilatus}', name='pilatus1_data')
+# pilatus1.tiff.read_attrs = []
+# pilatus1.tiff.kind = 'normal'
 
 #for looking at pilatus data
 
