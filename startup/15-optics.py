@@ -34,27 +34,25 @@ class SideBounceMono(Device):
     twist = Cpt(EpicsMotor, "Twist}Mtr")
 
 sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
-# Shutters:
-#fs = EpicsSignal('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
 #temporary fast shutter
-# class tempFSShutter:
+#class tempFSShutter:
 #
-#     def set(self, value):
-#         if value == 0:
-#             return fb_two_button_shutters.flt4.set('Close')
-#         elif value == 1:
-#             return fb_two_button_shutters.flt4.set('Open')
+#    def set(self, value):
+#        if value == 0:
+#            return fb_two_button_shutters.flt1.set('Close')
+#        elif value == 1:
+#            return fb_two_button_shutters.flt1.set('Open')
 #
-#     def read(self):
-#         return fb_two_button_shutters.read()
+#    def read(self):
+#        return fb_two_button_shutters.read()
 #
-#     def describe(self):
-#         return fb_two_button_shutters.describe()
+#    def describe(self):
+#        return fb_two_button_shutters.describe()
 #
-#     def stop(self, success=False):
-#         return self.set('close')
-
-# fs = tempFSShutter()
+#    def stop(self, success=False):
+#        return self.set('close')
+#
+#fs = tempFSShutter()
 
 # Close the shutter on stop
 # fs.stop = lambda *args, **kwargs: fs.set(0)
@@ -75,20 +73,20 @@ class PDFFastShutter(Device):
     def set(self, val):
         # NOTE: temporary workaround until the fast shutter works.
         #
-        # def check_if_done(value, old_value, **kwargs):
-        #     if ((val in ['Open', 1] and value == 0) or
-        #         (val in ['Close', 0] and value == 1)):
-        #         if self.st is not None:
-        #             self.st._finished()
-        #             self.st = None
-        #         return True
-        #     return False
+        def check_if_done(value, old_value, **kwargs):
+            if ((val in ['Open', 1] and value == 0) or
+                (val in ['Close', 0] and value == 1)):
+                if self.st is not None:
+                    self.st._finished()
+                    self.st = None
+                return True
+            return False
         self.cmd.set(self.setmap[val])
-        # status = SubscriptionStatus(self.status, check_if_done,settle_time=self.settle_time.get())
-        # return status
+        status = SubscriptionStatus(self.status, check_if_done,settle_time=self.settle_time.get())
+        return status
 
-        ttime.sleep(1.0)  # wait to set the value since the status PV does not capture the actual status
-        return NullStatus()
+        #ttime.sleep(1.0)  # wait to set the value since the status PV does not capture the actual status
+        #return NullStatus()
 
     def get(self):
         return self.readmap[self.cmd.get()]
@@ -101,9 +99,9 @@ class PDFFastShutter(Device):
     # def stop(self, success=False):
     #     return self.set('Close')
 
-
+#temporary disable fast shutter while broken - DO 5/18/2022
 fs = PDFFastShutter('XF:28ID1B-OP{PSh:1-Det:2}', name='fs')
-
+#if enable this, need to disable fs in 12-motors: line 80
 
 class Mirror(Device):
     y_upstream = Cpt(EpicsMotor, 'YU}Mtr')

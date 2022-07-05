@@ -63,5 +63,54 @@ pilatus1.tiff.kind = 'normal'
 
 
 
+#for looking at pilatus data
 
+def show_me2(my_im, count_low=0, count_high=1, use_colorbar=False, use_cmap='viridis'):
+    #my_low = np.percentile(my_im, per_low)
+    #my_high = np.percentile(my_im, per_high)
+    plt.imshow(my_im, vmin=count_low, vmax=count_high, cmap= use_cmap)
+    if use_colorbar:
+        plt.colorbar()
+
+
+
+def show_me_db2(
+    my_id,
+    count_low=1,
+    count_high=99,
+    use_colorbar=False,
+    dark_subtract=False,
+    return_im=False,
+    return_dark=False,
+    new_db = True,
+    use_cmap='viridis',
+    suffix="_image",
+):
+    my_det_probably = db[my_id].start["detectors"][0] + suffix
+    if new_db:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+    else:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1]).astype(float)
+
+    if len(my_im) == 0:
+        print("issue... passing")
+        pass
+    if dark_subtract:
+        if "sc_dk_field_uid" in db[my_id].start.keys():
+            my_dark_id = db[my_id].start["sc_dk_field_uid"]
+            if new_db:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+            else:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
+    
+            my_im = my_im - dark_im
+        else:
+            print("this run has no associated dark")
+    if return_im:
+        return my_im
+    if return_dark:
+        return dark_im
+    
+    #if all else fails, plot!
+    show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
 
