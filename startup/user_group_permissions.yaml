@@ -8,6 +8,7 @@ user_groups:
       - "move_sample"
       - "pdf_count"
       - "take_a_nap"
+      - ":^agent_"
 
     forbidden_plans:
       - ":^_"  # All plans with names starting with '_'
