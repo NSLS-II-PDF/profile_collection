@@ -66,7 +66,7 @@ nslsii.configure_base(
     bec=True,
     magics=True,
     mpl=False,
-    # publish_documents_to_kafka=True
+    publish_documents_with_kafka=True
 )
 del one_1d_step
 del one_nd_step

@@ -1,6 +1,9 @@
 import ophyd
-from ophyd import Device, Component as Cpt, EpicsSignal, EpicsSignalRO, EpicsMotor
-from nslsii.devices import TwoButtonShutter
+from ophyd import (Device, Component as Cpt,
+                   EpicsSignal, EpicsSignalRO, EpicsMotor)
+from ophyd.device import DeviceStatus
+from nslsii.devices import TwoButtonShutter as _TwoButtonShutter
+#import nslsii.devices
 
 # import nslsii.devices
 
@@ -72,6 +75,33 @@ class FilterBank(Device):
     flt4 = Cpt(EpicsSignal, "4}Cmd:Opn-Cmd", string=True)
 
 
+
+class TwoButtonShutter(_TwoButtonShutter):
+    def stop(self):
+        ...
+    def set(self, value):
+        if value == 0:
+            return super().set('Close')
+            #super().set('Close')
+            #status = DeviceStatus(self)
+            #return status
+        if value == 1:
+            return super().set('Open')
+        #    super().set('Open')
+        #    status = DeviceStatus(self)
+        #    return status
+
+    def read(self): #fix for whoever thought it was smart to use 'Not Open' instead of 'Close' - DO
+        ret = super().read()
+        val = ret['fb_two_button_shutters_flt1_status']['value']
+        if val == 'Not Open':
+            ret['fb_two_button_shutters_flt1_status']['value'] = 'Close'
+        return ret
+
+    # def read(self):
+    #    ret = super().read()
+    #    # FIX RET
+    #    return ret
 class FilterBankTwoButtonShutter(Device):
     flt1 = Cpt(TwoButtonShutter, "1}")
     flt2 = Cpt(TwoButtonShutter, "2}")
@@ -83,6 +113,10 @@ fb = FilterBank("XF:28ID1B-OP{Fltr:", name="fb")
 fb_two_button_shutters = FilterBankTwoButtonShutter(
     "XF:28ID1B-OP{Fltr:", name="fb_two_button_shutters"
 )
+
+#trying to make a temporary shutter - DO - 5/18/2022
+#fs = fb_two_button_shutters.flt4
+#if disable this, need to re-enable fs in 15-optics: line 105
 
 # Spinner Goniohead motors, add by HZ
 Spinnergo_X = EpicsMotor(
@@ -122,6 +156,13 @@ broadside45_shifter = EpicsMotor(
     "XF:28ID1B-ES{Smpl:Array-Ax:Horiz}Mtr", name="broadside45_shifter"
 )
 
-# NOx BOx x/y sample position
-noxbox_x = EpicsMotor("XF:28ID1B-ES{NOx-Ax:X}Mtr", name="noxbox_x")
-noxbox_y = EpicsMotor("XF:28ID1B-ES{NOx-Ax:Y}Mtr", name="noxbox_y")
+#NOx BOx x/y sample position
+noxbox_x = EpicsMotor('XF:28ID1B-ES{NOx-Ax:X}Mtr', name='noxbox_x')
+noxbox_y = EpicsMotor('XF:28ID1B-ES{NOx-Ax:Y}Mtr', name='noxbox_y')
+
+
+#Table X-tages
+OT_stage_1_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X1}Mtr', name='OT_stage_1_X', labels=['positioners'])
+OT_stage_2_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X2}Mtr', name='OT_stage_2_X', labels=['positioners'])
+OT_stage_3_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X3}Mtr', name='OT_stage_3_X', labels=['positioners'])
+OT_stage_4_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X4}Mtr', name='OT_stage_4_X', labels=['positioners'])
