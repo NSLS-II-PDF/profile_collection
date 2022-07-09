@@ -9,7 +9,6 @@ user_groups:
       - "pdf_count"
       - "take_a_nap"
       - ":^agent_"
-
     forbidden_plans:
       - ":^_"  # All plans with names starting with '_'
     allowed_devices:
