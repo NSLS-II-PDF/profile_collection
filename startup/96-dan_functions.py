@@ -582,7 +582,8 @@ def get_total_counts():
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     from epics import caget
-    #ensure shutter is closed
+    #ensure shutter is closedi
+    print ('closing shutter')
     RE(mv(fs,"Close"))
     I_list = np.zeros(numx)
     dx = (xmax - xmin) / numx

@@ -110,6 +110,7 @@ ECS_det1 = EpicsSignalRO(  'XF:28IDC-BI:1{IM:1}:C4_1' ,name='ECS_det1')
 
 #45-degree shifting motor on M6-grid, for use with hot air blower / cryostream with angled sample bracket
 broadside45_shifter = EpicsMotor('XF:28ID1B-ES{Smpl:Array-Ax:Horiz}Mtr', name='broadside45_shifter') 
+Multi_X = EpicsMotor('XF:28ID1B-ES{Smpl:Array-Ax:Horiz}Mtr', name='Multi_X') 
 
 #NOx BOx x/y sample position
 noxbox_x = EpicsMotor('XF:28ID1B-ES{NOx-Ax:X}Mtr', name='noxbox_x')
