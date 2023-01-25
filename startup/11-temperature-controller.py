@@ -262,7 +262,7 @@ class LinkamFurnace(PVPositioner):
         
         # Sets tolerance for skipping `set` calls when already at setpoint.
         self.setpoint_tolerance = setpoint_tolerance
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def set(self, new_position, *args, timeout=None, **kwargs):
 
