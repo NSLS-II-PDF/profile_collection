@@ -256,10 +256,22 @@ class LinkamFurnace(PVPositioner):
     done = C(EpicsSignalRO, 'STATUS')
     stop_signal = C(EpicsSignal, 'RAMP:CTRL:SET')
     temperature = C(EpicsSignal, "TEMP")
+    
 
-    def set(self, *args, timeout=None, **kwargs):
+    def __init__(self, *args, setpoint_tolerance=1, **kwargs):
         
-        return super().set(*args, timeout=timeout, **kwargs)
+        # Sets tolerance for skipping `set` calls when already at setpoint.
+        self.setpoint_tolerance = setpoint_tolerance
+        super().__init__(*args, **kwargs)
+
+    def set(self, new_position, *args, timeout=None, **kwargs):
+
+        # Check if new setpoint is within one degree of current temperature, and if the controller is
+        # at it's setpoint. If it is, return that the move was successful instantly to avoid lockup.
+        if abs(self.readback.get() - new_position) < self.setpoint_tolerance and self.status.get() & 4 == 1:
+            return DeviceStatus(self, success=True, done=True)
+        else:
+            return super().set(*args, timeout=timeout, **kwargs)
 
     def trigger(self):
         # There is nothing to do. Just report that we are done.
