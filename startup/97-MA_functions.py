@@ -251,9 +251,9 @@ def lastimage(n):
 
     I = light_img - dk_img
     imshow(I, vmax = (I.sum()/(2048*2048)), cmap = 'jet' )
-    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "dark_sub_image" + ".tiff", light_img - dk_img)
-    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "dark_image" + ".tiff", dk_img)
-    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "light_image" + ".tiff", light_img)
+    imsave("/nsls2/data/pdf/legacy/processed/xpdacq_data/MA_01_27_2023/" + "dark_sub_image" + ".tiff", light_img - dk_img)
+    imsave("/nsls2/data/pdf/legacy/processed/xpdacq_data/MA_01_27_2023/" + "dark_image" + ".tiff", dk_img)
+    imsave("/nsls2/data/pdf/legacy/processed/xpdacq_data/MA_01_27_2023/" + "light_image" + ".tiff", light_img)
     
 
 #---------------------------------HAB T setpoint threshold--------------------------------------------
