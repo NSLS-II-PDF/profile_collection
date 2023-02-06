@@ -102,7 +102,7 @@ else:
     # Do all setup in the constructor of UserInterface
     # HOME directory will be changed to the one in glbl
     ui = UserInterface(
-        area_dets=[pe1c, pe2c],
+        area_dets=[pe1c, pe2c, pilatus1],
         det_zs=[Det_1_Z.user_setpoint, Det_2_Z.user_setpoint],
         shutter=fs,
         temp_controller=eurotherm,

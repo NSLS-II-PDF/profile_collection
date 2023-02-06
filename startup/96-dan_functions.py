@@ -76,7 +76,7 @@ def show_me_db(
     dark_subtract=True,
     return_im=False,
     return_dark=False,
-    new_db=False,
+    new_db=True,
     suffix="_image",
 ):
     my_det_probably = db[my_id].start["detectors"][0] + suffix

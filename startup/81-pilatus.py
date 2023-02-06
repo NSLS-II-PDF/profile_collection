@@ -5,11 +5,42 @@ from ophyd import (SingleTrigger,
                    TIFFPlugin, ImagePlugin, DetectorBase,
                    HDF5Plugin, AreaDetector, EpicsSignal, EpicsSignalRO,
                    ROIPlugin, TransformPlugin, ProcessPlugin, PilatusDetector, 
-		   PilatusDetectorCam, StatsPlugin)
+		           PilatusDetectorCam, StatsPlugin)
+from ophyd.areadetector.filestore_mixins import FileStoreTIFFIterativeWrite
 from nslsii.ad33 import SingleTriggerV33, StatsPluginV33
+from collections import OrderedDict
+
 
 class TIFFPluginWithFileStore(TIFFPlugin, FileStoreTIFFIterativeWrite):
-    pass
+    def describe(self):
+        ret = super().describe()
+        key = self.parent._image_name
+        color_mode = self.parent.cam.color_mode.get(as_string=True)
+
+        if color_mode == "Mono":
+            ret[key]["shape"] = [
+                self.parent.cam.num_images.get(),
+                self.array_size.height.get(),
+                self.array_size.width.get()
+            ]
+        elif color_mode in ["RGB1", "Bayer"]:
+            ret[key]["shape"] = [self.parent.cam.num_images.get(), *self.array_size.get()]
+        else:
+            raise RuntimeError(f"Should never be here, color mode {color_mode} not in "
+                               f"['Mono', 'RGB1', 'Bayer']")
+
+        cam_dtype = self.data_type.get(as_string=True)
+        type_map = {
+            "UInt8": "|u1",
+            "UInt16": "<u2",
+            "Int32": "<i4",  # np.dtype('<i4') reports dtype('int32')
+            "Float32": "<f4",
+            "Float64": "<f8",
+        }
+        if cam_dtype in type_map:
+            ret[key].setdefault("dtype_str", type_map[cam_dtype])
+
+        return ret
 
 class PilatusDetectorCamV33(PilatusDetectorCam):
     wait_for_plugins = Cpt(EpicsSignal, 'WaitForPlugins',
@@ -28,6 +59,7 @@ class PilatusDetectorCamV33(PilatusDetectorCam):
             if hasattr(cpt, 'ensure_nonblocking'):
                 cpt.ensure_nonblocking()
 
+
 class PilatusV33(SingleTriggerV33, PilatusDetector):
     cam = Cpt(PilatusDetectorCamV33, 'cam1:')
     #stats1 = Cpt(StatsPluginV33, 'Stats1:')
@@ -45,7 +77,6 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
                suffix='TIFF1:',
                write_path_template='/nsls2/data/pdf/legacy/raw/pilatus1_data/%Y/%m/%d/',
                root='/nsls2/data/pdf/legacy/raw')
-
     
     def set_exposure_time(self, exposure_time, verbosity=3):
         yield from bps.mv(self.cam.acquire_time, exposure_time, self.cam.acquire_period, exposure_time+.1)
@@ -56,8 +87,9 @@ class PilatusV33(SingleTriggerV33, PilatusDetector):
         yield from bps.mv(self.cam.num_images, num_images)
         # self.cam.num_images = num_images
 
-pilatus1 = PilatusV33('XF:28ID1-ES{Det:Pilatus}', name='pilatus1_data')
-pilatus1.tiff.read_attrs = []
+
+pilatus1 = PilatusV33('XF:28ID1-ES{Det:Pilatus}', name='pilatus1')
+# pilatus1.tiff.read_attrs = []
 pilatus1.tiff.kind = 'normal'
 
 
@@ -114,3 +146,30 @@ def show_me_db2(
     #if all else fails, plot!
     show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
 
+
+####### convinence functions by Dan - 1/24/2023 ############
+def set_Pilatus_energy_for_threshold(energy = 74.0):
+    """ Default to energy = 74 (in keV), but can pass something else if you want """
+    print ('setting Pilatus energy, please wait...')
+    caput('XF:28ID1-ES{Det:Pilatus}cam1:Energy', energy)
+    caput('XF:28ID1-ES{Det:Pilatus}cam1:ThresholdEnergy', energy/2)
+    caput('XF:28ID1-ES{Det:Pilatus}cam1:ThresholdApply', 1)
+    time.sleep(8)
+
+def reset_Pilatus_Power(delay=15.0):
+    caput('XF:28ID1-ES{Det:Pilatus}cam1:ResetPowerTime', delay)
+    t0=time.time()
+    print ('performing Pilatus module power reset, please wait '+str(delay)+' seconds')
+    caput('XF:28ID1-ES{Det:Pilatus}cam1:ResetPower', 1)
+    time.sleep(delay)
+    print ('sleep time done, now waiting a bit more')
+    time.sleep(8)
+    print ('coming back online, need another 20 seconds')
+    time.sleep(20)
+
+def set_Pilatus_parameters(num_images=1, exposure_time=0.1):
+    print ('setting number of images per collection to '+str(num_images))
+    pilatus1.set_num_images(num_images)
+    print ('setting exposure time for a single image to '+str(exposure_time))
+    pilatus1.set_exposure_time(exposure_time)
+    time.sleep(1)
