@@ -128,10 +128,23 @@ def take_dark(cam, light_field, dark_field_name):
 class XPDFileStoreTIFFSquashing(FileStoreTIFFSquashing):
     def describe(self):
         description = super().describe()
-        shape = list(description[f"{self.parent.name}_image"]["shape"])
+        key = self.parent._image_name  # should be the same as f"{self.parent.name}_image"
+        shape = list(description[key]["shape"])
         shape[0] = self.get_frames_per_point()
         shape = tuple(shape)
-        description[f"{self.parent.name}_image"]["shape"] = shape
+        description[key]["shape"] = shape
+
+        cam_dtype = self.data_type.get(as_string=True)
+        type_map = {
+            "UInt8": "|u1",
+            "UInt16": "<u2",
+            "Int32": "<i4",  # np.dtype('<i4') reports dtype('int32')
+            "Float32": "<f4",
+            "Float64": "<f8",
+        }
+        if cam_dtype in type_map:
+            description[key].setdefault("dtype_str", type_map[cam_dtype])
+
         return description
 
 
