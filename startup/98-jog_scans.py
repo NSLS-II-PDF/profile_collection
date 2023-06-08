@@ -1,4 +1,7 @@
 from bluesky.utils import short_uid
+from ophyd.epics_motor import EpicsMotor
+from ophyd.device import Component as Cpt
+
 
 def future_count(detectors, num=1, delay=None, *, per_shot=None, md=None):
     """
@@ -151,6 +154,7 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
         yield from bps.abs_set(motor, stop, group=gp) # set motor to move towards end
         yield from bps.trigger_and_read(dets) # collect off detector
         yield from bps.wait(group=gp)
+        # this makes it alternate
         start, stop = stop, start
 
     return (yield from future_count(dets, md=_md, per_shot=per_shot, num=num))
@@ -158,5 +162,84 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
 def jog(exposure_s, motor, start, stop):
     """ pass total exposure time (in seconds), motor name (i.e. Grid_Y), start and stop positions for the motor."""
     yield from rocking_ct([pe1c], exposure_s, motor, start, stop)
-        
 
+
+class TweakableMotor(EpicsMotor):
+    tweak_forward = Cpt(EpicsSignal, ".TWF", kind="omitted", auto_monitor=False)
+    tweak_reverse = Cpt(EpicsSignal, ".TWR", kind="omitted", auto_monitor=False)
+    tweak_step = Cpt(EpicsSignal, ".TWV", kind="config", auto_monitor=False)
+
+# In [219]: def goto_GridY(pos):
+#      ...:     gridy_now = Grid_Y.read()['Grid_Y']['value']
+#      ...:     print ('current Grid_Y is at '+str(gridy_now))
+#      ...:     diff = gridy_now - pos
+#      ...:     print ('need to move '+str(diff))
+#      ...:     caput("XF:28ID1B-ES{Env:1-Ax:Y}Mtr.TWV",diff)
+#      ...:     time.sleep(2)
+#      ...:     caput("XF:28ID1B-ES{Env:1-Ax:Y}Mtr.TWR",1)
+#      ...:     time.sleep(1)
+#      ...:
+
+def hack_move(mtr, target):
+    """
+    A plan to use tweak to fake absolute moves with only relative motion at CA level
+
+    Parameters
+    ----------
+    mtr : TweakableMotor
+        A motor with
+    """
+    current = yield from bps.rd(mtr)
+    velo = yield from bps.rd(mtr.velocity)
+    diff = current - target
+    yield from bps.mv(mtr.teak_step, diff)
+    yield from bps.mv(mtr.tweak_reverse, 1)
+    # TODO sort out if there is a better way to get the end of the motion
+    yield from bps.sleep(diff / velo + 1)
+
+
+def tweak_count(exposure_s, motor, start, stop, *, md=None):
+    """
+    Take a "rocking" count using tweak
+
+    Parameters
+    ----------
+    exposure_s : float
+        Exposure time in seconds
+
+    motor : TweakableMotor
+        The motor to move via tweak
+
+    start, stop : float
+        The range to scan over
+
+    md : Optional[dict]
+        Any extra meta-data to put in to the start document
+    """
+
+    @bpp.reset_positions_decorator([motor.velocity])
+    def per_shot(dets):
+        "We have to do this in per-shot to not move during any darkframes"
+        nonlocal has_run
+        if has_run:
+            raise RuntimeError("This only works with one pass")
+        has_run = True
+        # set the motor speed
+        yield from bps.mv(motor.velocity, abs(stop - start) / exposure) # set velocity
+        # get where we are (should be start, but who knows!)
+        current = yield from bps.rd(mtr, default_value=start)
+        # set the tweak step
+        yield from bps.mv(mtr.teak_step, current - stop)
+        # start the (reverse) tweak going and YOLO
+        yield from bps.mv(mtr.tweak_reverse, 1)
+        # take the data
+        yield from bps.trigger_and_read(dets) # collect off detector
+
+    _md = md or {}
+    sp_md = yield from _xpd_pre_plan(dets, exposure)
+    _md.update(sp_md)
+
+    # go to the start the best we can
+    yield from hack_move(motor, start)
+
+    return (yield from future_count([pe1c], md=_md, per_shot=per_shot, num=1))
