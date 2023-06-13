@@ -174,4 +174,4 @@ def colored(text, tint='white', attrs=[],do_thing=False):
         return(text)
 
 linkam = Linkam('XF:28ID1-ES{LINKAM:T96}:', name='linkam', settle_time=0)  
-
+linkam.wait_for_connection()
