@@ -60,12 +60,54 @@ plt.ion()
 ###
 
 
-def show_me(my_im, per_low=1, per_high=99, use_colorbar=False):
+def show_me(my_im, per_low=1, per_high=99, use_colorbar=False, use_true_bounds=False, true_low=0, true_high=1000):
     my_low = np.percentile(my_im, per_low)
     my_high = np.percentile(my_im, per_high)
-    plt.imshow(my_im, vmin=my_low, vmax=my_high)
+    if use_true_bounds:
+        plt.imshow(my_im, vmin=true_low, vmax=true_high)
+    else:
+        plt.imshow(my_im, vmin=my_low, vmax=my_high)
     if use_colorbar:
         plt.colorbar()
+
+def show_me_db_streams(
+    my_id,
+    per_low=1,
+    per_high=99,
+    true_low = 0,
+    true_high = 1000,
+    use_colorbar=False,
+    use_true_bounds = False,
+    dark_subtract=True,
+    return_im=False,
+    return_dark=False,
+    suffix="_image",
+):
+    my_det_probably = db[my_id].start["detectors"][0] + suffix
+    if "primary" in db[my_id].stream_names:
+        my_im = np.array(list(db[my_id].data(my_det_probably, stream_name="primary")))[0][0]
+    else:
+        print ("Primary stream missing, wtf.")
+    
+    my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+
+    if len(my_im) == 0:
+        print("issue... passing")
+        pass
+
+    if dark_subtract:
+        if "dark" in db[my_id].stream_names:
+            dark_im = np.array(list(db[my_id].data(my_det_probably, stream_name="dark")))[0][0]
+            my_im = my_im - dark_im
+        else:
+            print("this run has no associated dark")
+    if return_im:
+        return my_im
+    if return_dark:
+        return dark_im
+
+    show_me(my_im, per_low=per_low, per_high=per_high, use_colorbar=use_colorbar,
+            true_low = true_low, true_high=true_high,use_true_bounds=use_true_bounds)
 
 
 def show_me_db(
