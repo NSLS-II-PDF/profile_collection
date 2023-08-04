@@ -659,61 +659,6 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     return pos_list, I_list
 
 
-def configure_area_det(det, exposure):
-    '''Configure an area detector in "continuous mode"'''
-
-    def _check_mini_expo(exposure, acq_time):
-        if exposure < acq_time:
-            raise ValueError(
-                "WARNING: total exposure time: {}s is shorter "
-                "than frame acquisition time {}s\n"
-                "you have two choices:\n"
-                "1) increase your exposure time to be at least"
-                "larger than frame acquisition time\n"
-                "2) increase the frame rate, if possible\n"
-                "    - to increase exposure time, simply resubmit"
-                " the ScanPlan with a longer exposure time\n"
-                "    - to increase frame-rate/decrease the"
-                " frame acquisition time, please use the"
-                " following command:\n"
-                "    >>> {} \n then rerun your ScanPlan definition"
-                " or rerun the xrun.\n"
-                "Note: by default, xpdAcq recommends running"
-                "the detector at its fastest frame-rate\n"
-                "(currently with a frame-acquisition time of"
-                "0.1s)\n in which case you cannot set it to a"
-                "lower value.".format(
-                    exposure,
-                    acq_time,
-                    ">>> glbl['frame_acq_time'] = 0.5  #set" " to 0.5s",
-                )
-            )
-
-    # todo make
-    ret = yield from bps.read(det.cam.acquire_time)
-    if ret is None:
-        acq_time = 1
-    else:
-        acq_time = ret[det.cam.acquire_time.name]["value"]
-    _check_mini_expo(exposure, acq_time)
-    if hasattr(det, "images_per_set"):
-        # compute number of frames
-        num_frame = np.ceil(exposure / acq_time)
-        yield from bps.mov(det.images_per_set, num_frame)
-    else:
-        # The dexela detector does not support `images_per_set` so we just
-        # use whatever the user asks for as the thing
-        # TODO: maybe put in warnings if the exposure is too long?
-        num_frame = 1
-    computed_exposure = num_frame * acq_time
-
-    # print exposure time
-    print(
-        "INFO: requested exposure time = {} - > computed exposure time"
-        "= {}".format(exposure, computed_exposure)
-    )
-    return num_frame, acq_time, computed_exposure
-
 
 def simple_ct(dets, exposure, *, md=None):
     """A minimal wrapper around count that adjusts exposure time."""
@@ -851,7 +796,7 @@ def phase_parser(phase_str):
     return composition_dict, phase_dict, composition_str
 
 
-del pe1c.tiff.stage_sigs[pe1c.proc.reset_filter]
+pe1c.tiff.stage_sigs.pop(pe1c.proc.reset_filter, None)
 
 #for looking at data from Pilatus detector
 
