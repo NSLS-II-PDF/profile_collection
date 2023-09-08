@@ -60,12 +60,54 @@ plt.ion()
 ###
 
 
-def show_me(my_im, per_low=1, per_high=99, use_colorbar=False):
+def show_me(my_im, per_low=1, per_high=99, use_colorbar=False, use_true_bounds=False, true_low=0, true_high=1000):
     my_low = np.percentile(my_im, per_low)
     my_high = np.percentile(my_im, per_high)
-    plt.imshow(my_im, vmin=my_low, vmax=my_high)
+    if use_true_bounds:
+        plt.imshow(my_im, vmin=true_low, vmax=true_high)
+    else:
+        plt.imshow(my_im, vmin=my_low, vmax=my_high)
     if use_colorbar:
         plt.colorbar()
+
+def show_me_db_streams(
+    my_id,
+    per_low=1,
+    per_high=99,
+    true_low = 0,
+    true_high = 1000,
+    use_colorbar=False,
+    use_true_bounds = False,
+    dark_subtract=True,
+    return_im=False,
+    return_dark=False,
+    suffix="_image",
+):
+    my_det_probably = db[my_id].start["detectors"][0] + suffix
+    if "primary" in db[my_id].stream_names:
+        my_im = np.array(list(db[my_id].data(my_det_probably, stream_name="primary")))[0][0]
+    else:
+        print ("Primary stream missing, wtf.")
+    
+    my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+
+    if len(my_im) == 0:
+        print("issue... passing")
+        pass
+
+    if dark_subtract:
+        if "dark" in db[my_id].stream_names:
+            dark_im = np.array(list(db[my_id].data(my_det_probably, stream_name="dark")))[0][0]
+            my_im = my_im - dark_im
+        else:
+            print("this run has no associated dark")
+    if return_im:
+        return my_im
+    if return_dark:
+        return dark_im
+
+    show_me(my_im, per_low=per_low, per_high=per_high, use_colorbar=use_colorbar,
+            true_low = true_low, true_high=true_high,use_true_bounds=use_true_bounds)
 
 
 def show_me_db(
@@ -76,7 +118,7 @@ def show_me_db(
     dark_subtract=True,
     return_im=False,
     return_dark=False,
-    new_db=False,
+    new_db=True,
     suffix="_image",
 ):
     my_det_probably = db[my_id].start["detectors"][0] + suffix
@@ -582,7 +624,8 @@ def get_total_counts():
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     from epics import caget
-    #ensure shutter is closed
+    #ensure shutter is closedi
+    print ('closing shutter')
     RE(mv(fs,"Close"))
     I_list = np.zeros(numx)
     dx = (xmax - xmin) / numx
@@ -615,61 +658,6 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     RE(mv(fs, "Close"))
     return pos_list, I_list
 
-
-def configure_area_det(det, exposure):
-    '''Configure an area detector in "continuous mode"'''
-
-    def _check_mini_expo(exposure, acq_time):
-        if exposure < acq_time:
-            raise ValueError(
-                "WARNING: total exposure time: {}s is shorter "
-                "than frame acquisition time {}s\n"
-                "you have two choices:\n"
-                "1) increase your exposure time to be at least"
-                "larger than frame acquisition time\n"
-                "2) increase the frame rate, if possible\n"
-                "    - to increase exposure time, simply resubmit"
-                " the ScanPlan with a longer exposure time\n"
-                "    - to increase frame-rate/decrease the"
-                " frame acquisition time, please use the"
-                " following command:\n"
-                "    >>> {} \n then rerun your ScanPlan definition"
-                " or rerun the xrun.\n"
-                "Note: by default, xpdAcq recommends running"
-                "the detector at its fastest frame-rate\n"
-                "(currently with a frame-acquisition time of"
-                "0.1s)\n in which case you cannot set it to a"
-                "lower value.".format(
-                    exposure,
-                    acq_time,
-                    ">>> glbl['frame_acq_time'] = 0.5  #set" " to 0.5s",
-                )
-            )
-
-    # todo make
-    ret = yield from bps.read(det.cam.acquire_time)
-    if ret is None:
-        acq_time = 1
-    else:
-        acq_time = ret[det.cam.acquire_time.name]["value"]
-    _check_mini_expo(exposure, acq_time)
-    if hasattr(det, "images_per_set"):
-        # compute number of frames
-        num_frame = np.ceil(exposure / acq_time)
-        yield from bps.mov(det.images_per_set, num_frame)
-    else:
-        # The dexela detector does not support `images_per_set` so we just
-        # use whatever the user asks for as the thing
-        # TODO: maybe put in warnings if the exposure is too long?
-        num_frame = 1
-    computed_exposure = num_frame * acq_time
-
-    # print exposure time
-    print(
-        "INFO: requested exposure time = {} - > computed exposure time"
-        "= {}".format(exposure, computed_exposure)
-    )
-    return num_frame, acq_time, computed_exposure
 
 
 def simple_ct(dets, exposure, *, md=None):
@@ -808,4 +796,61 @@ def phase_parser(phase_str):
     return composition_dict, phase_dict, composition_str
 
 
-del pe1c.tiff.stage_sigs[pe1c.proc.reset_filter]
+pe1c.tiff.stage_sigs.pop(pe1c.proc.reset_filter, None)
+
+#for looking at data from Pilatus detector
+
+def set_Pilatus_parameters(num_images=1, exposure_time=0.1):
+    print ('setting number of images per collection to '+str(num_images))
+    pilatus1.set_num_images(num_images)
+    print ('setting exposure time for a single image to '+str(exposure_time))
+    pilatus1.set_exposure_time(exposure_time)
+    
+
+def show_me2(my_im, count_low=0, count_high=1, use_colorbar=False, use_cmap='viridis'):
+    #my_low = np.percentile(my_im, per_low)
+    #my_high = np.percentile(my_im, per_high)
+    plt.imshow(my_im, vmin=count_low, vmax=count_high, cmap= use_cmap)
+    if use_colorbar:
+        plt.colorbar()
+
+def show_me_db2(
+    my_id,
+    count_low=1,
+    count_high=99,
+    use_colorbar=False,
+    dark_subtract=False,
+    return_im=False,
+    return_dark=False,
+    new_db = True,
+    use_cmap='viridis',
+    suffix="_image",
+):
+    my_det_probably = db[my_id].start["detectors"][0] + suffix
+    if new_db:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+    else:
+        my_im = (db[my_id].table(fill=True)[my_det_probably][1]).astype(float)
+
+    if len(my_im) == 0:
+        print("issue... passing")
+        pass
+    if dark_subtract:
+        if "sc_dk_field_uid" in db[my_id].start.keys():
+            my_dark_id = db[my_id].start["sc_dk_field_uid"]
+            if new_db:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1][0]).astype(float)
+            else:
+                dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
+    
+            my_im = my_im - dark_im
+        else:
+            print("this run has no associated dark")
+    if return_im:
+        return my_im
+    if return_dark:
+        return dark_im
+    
+    #if all else fails, plot!
+    show_me2(my_im, count_low=count_low, count_high=count_high, use_colorbar=use_colorbar, use_cmap=use_cmap)
+

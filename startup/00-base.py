@@ -21,7 +21,7 @@ nslsii.configure_base(
     bec=True,
     magics=True,
     mpl=False,
-   # publish_documents_to_kafka=True
+    publish_documents_with_kafka=True
 )
 
 from pathlib import Path
