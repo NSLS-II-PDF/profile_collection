@@ -1,5 +1,14 @@
 import redis, ast, json
 
+
+redis_host = 'info.pdf.nsls2.bnl.gov'
+
+rkvs = redis.Redis(host=redis_host, port=6379, db=0)
+
+my_config = {'auto_mask': False,
+    'user_mask': '/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/my_mask.npy',
+    'method': 'splitpixel'} 
+
 def rkvs_keys(printed=True):
     '''Convert rkvs.keys() into a list of normal strings
     With printed=True, write a table of keys and values to the screen
@@ -19,14 +28,6 @@ def rkvs_keys(printed=True):
         return()
     else:
         return(keys)
-
-redis_host = 'info.pdf.nsls2.bnl.gov'
-
-rkvs = redis.Redis(host=redis_host, port=6379, db=0)
-
-my_config = {'auto_mask': False,
-    'user_mask': '/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/my_mask_xrd.npy',
-    'method': 'splitpixel'} 
 
 def read_index_data_smart(filename,junk=None,backjunk=None,splitchar=None, do_not_float=False, shh=True, use_idex=[0,1]):
     with open(filename,'r',encoding="utf8") as infile:
@@ -98,40 +99,111 @@ def retrieve_background():
     y = ast.literal_eval(rkvs.get('PDF:bgd:y').decode('utf-8'))
     return x,y
 
-def stow_sample_number(sample_num):
-    rkvs.set('PDF:xpdacq:sample_number', sample_num)
+#def stow_sample_number(sample_num):
+#    rkvs.set('PDF:xpdacq:sample_number', sample_num)
 
-def retrieve_sample_number():
-    return int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8'))
+#def retrieve_sample_number():
+#    return int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8'))
 
-def stow_exposure_time(exposure_time):
-    rkvs.set('PDF:desired_exposure_time',exposure_time)
+#def stow_exposure_time(exposure_time):
+#    rkvs.set('PDF:desired_exposure_time',exposure_time)
 
-def retrieve_exposure_time():
-    return float(rkvs.get('PDF:desired_exposure_time').decode('utf-8'))
+#def retrieve_exposure_time():
+#    return float(rkvs.get('PDF:desired_exposure_time').decode('utf-8'))
 
-def stow_sample_info(sample_num):
-    info =dict(bt.samples[list(bt.samples.keys())[sample_num]])
-    j_info = json.dumps(info)
-    rkvs.set('PDF:xpdacq:sample_info',j_info)
+#def stow_sample_info(sample_num):
+#    info =dict(bt.samples[list(bt.samples.keys())[sample_num]])
+#    j_info = json.dumps(info)
+#    rkvs.set('PDF:xpdacq:sample_info',j_info)
 
-def retrieve_sample_info():
-    j_info = rkvs.get('PDF:xpdacq:sample_info')
-    return json.loads(j_info)
+#def retrieve_sample_info():
+#    j_info = rkvs.get('PDF:xpdacq:sample_info')
+#    return json.loads(j_info)
 
-def stow_scanplan_num(scanplan_num):
-    rkvs.set('PDF:xpdacq:scanplan_num', scanplan_num)
+#def stow_scanplan_num(scanplan_num):
+#    rkvs.set('PDF:xpdacq:scanplan_num', scanplan_num)
 
-def retrieve_scanplan_num():
-    return int(rkvs.get('PDF:xpdacq:scanplan_num').decode('utf-8'))
+#def retrieve_scanplan_num():
+#    return int(rkvs.get('PDF:xpdacq:scanplan_num').decode('utf-8'))
 
-def redis_aware_scan(sample_num=0, exposure=5, my_config=my_config, scanplan_num=0):
-   #goto_sample pos
-   #update info in redis
-   stow_sample_info(sample_num)
-   stow_sample_number(sample_num)
-   stow_pdfstream_config(my_config)
-   stow_exposure_time(exposure)
-   stow_scanplan_num(scanplan_num)
-   xrun(sample_num, scanplan_num, user_config=my_config)
  
+def stow_bt_sample_info():
+   all_sample_names = list(bt.samples)
+   big_dict = {}
+   for this in all_sample_names:
+       mini_dict = dict(bt.samples[this])
+       big_dict[this] = mini_dict
+   j_sample_dict = json.dumps(big_dict)
+   rkvs.set('PDF:xpdacq:sample_dict', j_sample_dict)
+
+#def retrieve_bt_sample_info():
+#   j_sample_dict = rkvs.get('PDF:xpdacq:sample_dict')
+#   return json.loads(j_sample_dict)
+
+#def save_background_from_redis(output_file):
+#    """ provide path for csv output_file (e.g. background.csv') """
+#    xb, yb = retrieve_background()
+#    pd.DataFrame(zip(np.array(xb), np.array(yb))).to_csv(output_file, header=None, index=None)
+#
+#def read_background_csv_into_redis(background_file, return_bgd = False):
+#    xb, yb = pd.read_csv(background_file,index_col=None,header=None)
+#    stow_background(xb, yb)
+#    if return_bgd:
+#        return xb, yb
+
+def stow_Det_1_Z_near(near_coord):
+    rkvs.set('PDF:bl_config:Det_1_Z:near',near_coord)
+
+def stow_Det_1_Z_far(far_coord):
+    rkvs.set('PDF:bl_config:Det_1_Z:far',far_coord)
+
+
+def retrieve_Det_1_Z_near():
+    return float(rkvs.get('PDF:bl_config:Det_1_Z:near').decode('utf-8'))
+    
+def retrieve_Det_1_Z_far():
+    return float(rkvs.get('PDF:bl_config:Det_1_Z:far').decode('utf-8'))
+    
+def stow_pdfstream_config_near(my_config):
+    p_my_config = json.dumps(my_config)
+    rkvs.set('PDF:xpdacq:user_config:near',p_my_config)
+
+def retrieve_pdfstream_config_near():
+    p_my_config = rkvs.get('PDF:xpdacq:user_config:near')
+    return json.loads(p_my_config)
+
+def stow_pdfstream_config_far(my_config):
+    p_my_config = json.dumps(my_config)
+    rkvs.set('PDF:xpdacq:user_config:far',p_my_config)
+
+def retrieve_pdfstream_config_far():
+    p_my_config = rkvs.get('PDF:xpdacq:user_config:far')
+    return json.loads(p_my_config)
+
+
+def retrieve_pdfstream_pdfCalib():
+    p_info = rkvs.get('PDF:xpdacq:pdf_calibration_md')
+    return json.loads(p_info)
+def retrieve_pdfstream_xrdCalib():
+    p_info = rkvs.get('PDF:xpdacq:xrd_calibration_md')
+    return json.loads(p_info)
+
+def stow_pdfstream_xrdCalib(xrd_calib):
+    p_my_calib = json.dumps(xrd_calib)
+    rkvs.set('PDF:xpdacq:xrd_calibration_md',p_my_calib)
+def stow_pdfstream_pdfCalib(pdf_calib):
+    p_my_calib = json.dumps(pdf_calib)
+    rkvs.set('PDF:xpdacq:pdf_calibration_md',p_my_calib)
+
+
+#def stow_xrd_sample_number(sample_num):
+#    rkvs.set('PDF:xpdacq:xrd_sample_number', sample_num)
+    
+#def stow_pdf_sample_number(sample_num):
+#    rkvs.set('PDF:xpdacq:pdf_sample_number', sample_num)
+
+#def retrieve_pdf_sample_number():
+#    return int(rkvs.get('PDF:xpdacq:pdf_sample_number').decode('utf-8'))
+
+#def retrieve_xrd_sample_number():
+#    return int(rkvs.get('PDF:xpdacq:xrd_sample_number').decode('utf-8'))

@@ -361,7 +361,7 @@ pe1 = PerkinElmerStandard1('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff
 #pe1.stage_sigs.pop('cam.acquire')
 
 ################
-#Enabled for PE2 detector testing 11/25/19
+#Enabled for PE2 detector testing 11/25/19 - disabled for startup 8/22/2023 DO
 pe2 = PerkinElmerStandard2('XF:28ID1-ES{Det:PE2}', name='pe2', read_attrs=['tiff'])
 #################
 
@@ -370,7 +370,7 @@ pe2 = PerkinElmerStandard2('XF:28ID1-ES{Det:PE2}', name='pe2', read_attrs=['tiff
 pe1c = PerkinElmerContinuous1('XF:28ID1-ES{Det:PE1}', name='pe1c',
                             read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
-################
+################ - disabled for startup 8/22/2023 DO
 pe2c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe2c',
                             read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
@@ -385,7 +385,7 @@ pe2c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe2c',
 #temporary disable detector for testing -DO 7/11/19
 pe1c.detector_type.kind='config'
 pe1.detector_type.kind='config'
-###################
+################### - disabled for startup 8/22/2023 DO
 pe2c.detector_type.kind='config'
 pe2.detector_type.kind='config'
 
