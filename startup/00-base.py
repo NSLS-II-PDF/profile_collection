@@ -9,7 +9,7 @@ from bluesky.utils import ts_msg_hook
 
 from ophyd.signal import EpicsSignalBase
 # from Tom Caswell to fix the 'None bug' - whatever that is. DO 7/9/2021
-EpicsSignalBase.set_defaults(timeout=10, connection_timeout=10)
+EpicsSignalBase.set_defaults(timeout=30, connection_timeout=30)
 
 # See docstring for nslsii.configure_base() for more details
 # this command takes away much of the boilerplate for settting up a profile

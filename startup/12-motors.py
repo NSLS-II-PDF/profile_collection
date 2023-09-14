@@ -117,8 +117,12 @@ noxbox_x = EpicsMotor('XF:28ID1B-ES{NOx-Ax:X}Mtr', name='noxbox_x')
 noxbox_y = EpicsMotor('XF:28ID1B-ES{NOx-Ax:Y}Mtr', name='noxbox_y')
 
 
-#Table X-tages
+#Table stages
 OT_stage_1_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X1}Mtr', name='OT_stage_1_X', labels=['positioners'])
+
 OT_stage_2_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X2}Mtr', name='OT_stage_2_X', labels=['positioners'])
+OT_stage_2_Y = EpicsMotor('XF:28ID1B-ES:1{Sample:Tbl-Ax:Y1}Mtr', name='OT_stage_2_Y', labels=['positioners'])
+
 OT_stage_3_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X3}Mtr', name='OT_stage_3_X', labels=['positioners'])
+
 OT_stage_4_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X4}Mtr', name='OT_stage_4_X', labels=['positioners'])
