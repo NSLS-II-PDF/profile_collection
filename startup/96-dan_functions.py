@@ -396,7 +396,8 @@ def scan_shifter_pos(
     use_det=True,
     abs_data = False,
     oset_data = 0.0,
-    return_to_start = True
+    return_to_start = True,
+    recover_last_scan = False
 ):
     def yn_question(q):
         return input(q).lower().strip()[0] == "y"
@@ -404,33 +405,40 @@ def scan_shifter_pos(
     init_pos = motor.position
 
     print("")
-    print("I'm going to move the motor: " + str(motor.name))
-    print("It's currently at position: " + str(motor.position))
-    move_coord = float(xmin) - float(motor.position)
-    if move_coord < 0:
-        print(
-            "So I will start by moving "
-            + str(abs(move_coord))[:4]
-            + " mm inboard from current location"
-        )
-    elif move_coord > 0:
-        print(
-            "So I will start by moving "
-            + str(abs(move_coord))[:4]
-            + " mm outboard from current location"
-        )
-    elif move_coord == 0:
-        print("I'm starting where I am right now :)")
+    if not recover_last_scan:
+        print("I'm going to move the motor: " + str(motor.name))
+        print("It's currently at position: " + str(motor.position))
+        move_coord = float(xmin) - float(motor.position)
+        if move_coord < 0:
+            print(
+                "So I will start by moving "
+                + str(abs(move_coord))[:4]
+                + " mm inboard from current location"
+            )
+        elif move_coord > 0:
+            print(
+                "So I will start by moving "
+                + str(abs(move_coord))[:4]
+                + " mm outboard from current location"
+            )
+        elif move_coord == 0:
+            print("I'm starting where I am right now :)")
+        else:
+            print("I confused")
+    
+        if not yn_question("Confirm scan? [y/n] "):
+            print("Aborting operation")
+            return None
+    
+        pos_list, I_list = _motor_move_scan_shifter_pos(
+            motor=motor, xmin=xmin, xmax=xmax, numx=numx)
     else:
-        print("I confused")
+        print ('recovering last scan from redis...')
+        return_to_start = False
+        pos_list, I_list = retrieve_recent_shifter_scan()
+        plt.figure()
+        plt.plot(pos_list, I_list)
 
-    if not yn_question("Confirm scan? [y/n] "):
-        print("Aborting operation")
-        return None
-
-    pos_list, I_list = _motor_move_scan_shifter_pos(
-        motor=motor, xmin=xmin, xmax=xmax, numx=numx
-    )
     if len(pos_list) > 1:
         delx = pos_list[1] - pos_list[0]
     else:
@@ -637,6 +645,8 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     time.sleep(1)
     fig1, ax1 = plt.subplots()
     use_det = True
+    temp_pos_list = []
+    temp_I_list = []
     for i, pos in enumerate(pos_list):
         print("moving to " + str(pos))
         try:
@@ -649,6 +659,11 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
             my_int = float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
         else:
             my_int = float(caget("XF:28ID1B-OP{Det:1-Det:2}Amp:bkgnd"))
+
+        temp_I_list.append(my_int)
+        temp_pos_list.append(pos)
+        stow_recent_shifter_scan(temp_pos_list, temp_I_list)
+
         I_list[i] = my_int
         ax1.scatter(pos, my_int, color="k")
         plt.pause(0.01)
@@ -656,6 +671,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     plt.plot(pos_list, I_list)
     # plt.close()
     RE(mv(fs, "Close"))
+    stow_recent_shifter_scan(pos_list, I_list)
     return pos_list, I_list
 
 
