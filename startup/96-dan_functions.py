@@ -595,7 +595,7 @@ def _identify_peaks_scan_shifter_pos(
         )
         plt.plot(cut_x, cut_y)
 
-        this_guess = [peak_cen_guess_list[i], 1, peak_amp_guess_list[i], 0]
+        this_guess = [peak_cen_guess_list[i], 1, peak_amp_guess_list[i], 0.0001]
         low_limits = [peak_cen_guess_list[i] - peak_rad, 0.05, 0.0, 0.0]
         high_limits = [peak_cen_guess_list[i] + peak_rad, 3, 1.5, 0.5]
 
