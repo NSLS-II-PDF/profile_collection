@@ -132,7 +132,8 @@ class MoreCustomizedRunEngine(CustomizedRunEngine):
 from bluesky.utils import ts_msg_hook
 RE = MoreCustomizedRunEngine(None)
 RE.msg_hook = ts_msg_hook
-RE.md.update(xrun.md)
+RE.md = {}
+#RE.md.update(xrun.md)
 # insert header to db, either simulated or real
 RE.subscribe(db.insert, "all")
 RE.beamtime = bt

@@ -182,7 +182,7 @@ class XPDPerkinElmer(PerkinElmerDetector):
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA
-             read_attrs=[]) #- MA  
+             read_attrs=[]) #- MA
     # hdf5 = C(XPDHDF5Plugin, 'HDF1:',
     #          write_path_template='G:/pe1_data/%Y/%m/%d/',
     #          read_path_template='/direct/XF28ID2/pe1_data/%Y/%m/%d/',
@@ -309,10 +309,10 @@ class ContinuousAcquisitionTrigger(BlueskyInterface):
              #old style, simple runtime error (no rescue attempt)
              #raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
              #                   "the detector to already be acquiring.")
-             
-        #if we get this far, we can now stage the detector. 
+
+        #if we get this far, we can now stage the detector.
         super().stage()
-        
+
         # put logic to look up proper dark frame
         # die if none is found
 
@@ -467,4 +467,3 @@ class CachedDetector:
 
 # some defaults, as an example of how to use this
 # pe1.configure(dict(images_per_set=6, number_of_sets=10))
-
