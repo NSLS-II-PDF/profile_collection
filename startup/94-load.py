@@ -57,8 +57,15 @@ if xpdacq_version < (1, 1, 0):
     xrun.md['beamline_id'] = glbl['beamline_id']
     xrun.md['group'] = glbl['group']
     xrun.md['facility'] = glbl['facility']
-    with open(glbl['blconfig_path'], "r") as f:
-        beamline_config = yaml.unsafe_load(f)
+
+    # This works for Qserver
+    if is_re_worker_active():
+        with open(glbl["blconfig_path"], "r") as f:
+            beamline_config = yaml.unsafe_load(f)
+    else:
+        # This works for BSUI
+        beamline_config = _load_beamline_config(glbl['blconfig_path'])
+
     xrun.md['beamline_config'] = beamline_config
 
     # insert header to db, either simulated or real
@@ -120,9 +127,8 @@ else:
     # Remove the variables that won't be used
     del UserInterface, ui
 
-    # remove the uselss names
-    del xpdacq_version
-
+# remove the uselss names
+del xpdacq_version
 
 class MoreCustomizedRunEngine(CustomizedRunEngine):
     def __call__(self, plan, *args, **kwargs):
@@ -139,5 +145,8 @@ RE.subscribe(db.insert, "all")
 RE.beamtime = bt
 RE.clear_suspenders()
 
-del Tramp
-del Tlist
+
+# Remove plans Qserver can't interpret
+if is_re_worker_active():
+    del Tramp
+    del Tlist

@@ -9,6 +9,18 @@ my_config = {'auto_mask': False,
     'user_mask': '/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/my_mask.npy',
     'method': 'splitpixel'} 
 
+
+def convert_1d_nparray_to_json(x):
+    if type(x) is np.ndarray:
+        xlist = x.tolist()
+    elif type(x) is list:
+        xlist = x
+    else:
+        print ("unknown type")
+    json_x = json.dumps(xlist)
+    return json_x
+
+
 def rkvs_keys(printed=True):
     '''Convert rkvs.keys() into a list of normal strings
     With printed=True, write a table of keys and values to the screen
@@ -126,7 +138,21 @@ def retrieve_background():
 #def retrieve_scanplan_num():
 #    return int(rkvs.get('PDF:xpdacq:scanplan_num').decode('utf-8'))
 
- 
+
+def stow_recent_shifter_scan(x,y):
+    xjson = convert_1d_nparray_to_json(x)
+    yjson = convert_1d_nparray_to_json(y)
+    rkvs.set('PDF:scan_shifter_pos:x',xjson)
+    rkvs.set('PDF:scan_shifter_pos:y',yjson)
+    
+def retrieve_recent_shifter_scan():
+    xjson = rkvs.get('PDF:scan_shifter_pos:x')
+    yjson = rkvs.get('PDF:scan_shifter_pos:y')
+    x = np.array(json.loads(xjson))
+    y = np.array(json.loads(yjson))
+    return x,y 
+
+
 def stow_bt_sample_info():
    all_sample_names = list(bt.samples)
    big_dict = {}
@@ -195,6 +221,26 @@ def stow_pdfstream_pdfCalib(pdf_calib):
     p_my_calib = json.dumps(pdf_calib)
     rkvs.set('PDF:xpdacq:pdf_calibration_md',p_my_calib)
 
+def stow_beamtime_info(proposal_num, saf_num, session_num=0):
+    rkvs.set('PDF:bt_info:proposal_id', proposal_num)
+    rkvs.set('PDF:bt_info:data_session', 'pass-'+str(proposal_num))
+    rkvs.set('PDF:bt_info:saf_id', saf_num)
+    rkvs.set('PDF:bt_info:session_id',session_num)
+
+def retrieve_beamtime_info():
+    try:
+        proposal_num = int(rkvs.get('PDF:bt_info:proposal_id'))
+        saf_num = int(rkvs.get('PDF:bt_info:saf_id'))
+        session_num = int(rkvs.get('PDF:bt_info:session_id'))
+        this_dict = {}
+        this_dict['data_session'] = proposal_num
+        this_dict['saf_id'] = saf_num
+        this_dict['session_id'] = session_num
+        return this_dict
+
+    except:
+        print ('problem retrieving beamtime info')
+        return None
 
 #def stow_xrd_sample_number(sample_num):
 #    rkvs.set('PDF:xpdacq:xrd_sample_number', sample_num)
