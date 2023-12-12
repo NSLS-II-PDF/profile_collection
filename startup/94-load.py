@@ -130,6 +130,22 @@ else:
 # remove the uselss names
 del xpdacq_version
 
+class MoreCustomizedRunEngine(CustomizedRunEngine):
+    def __call__(self, plan, *args, **kwargs):
+        super().__call__({}, plan, *args, **kwargs)
+
+
+from bluesky.utils import ts_msg_hook
+RE = MoreCustomizedRunEngine(None)
+RE.msg_hook = ts_msg_hook
+RE.md = {}
+#RE.md.update(xrun.md)
+# insert header to db, either simulated or real
+RE.subscribe(db.insert, "all")
+RE.beamtime = bt
+RE.clear_suspenders()
+
+
 # Remove plans Qserver can't interpret
 if is_re_worker_active():
     del Tramp
