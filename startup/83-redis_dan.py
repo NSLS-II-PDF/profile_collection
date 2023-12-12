@@ -221,6 +221,26 @@ def stow_pdfstream_pdfCalib(pdf_calib):
     p_my_calib = json.dumps(pdf_calib)
     rkvs.set('PDF:xpdacq:pdf_calibration_md',p_my_calib)
 
+def stow_beamtime_info(proposal_num, saf_num, session_num=0):
+    rkvs.set('PDF:bt_info:proposal_id', proposal_num)
+    rkvs.set('PDF:bt_info:data_session', 'pass-'+str(proposal_num))
+    rkvs.set('PDF:bt_info:saf_id', saf_num)
+    rkvs.set('PDF:bt_info:session_id',session_num)
+
+def retrieve_beamtime_info():
+    try:
+        proposal_num = int(rkvs.get('PDF:bt_info:proposal_id'))
+        saf_num = int(rkvs.get('PDF:bt_info:saf_id'))
+        session_num = int(rkvs.get('PDF:bt_info:session_id'))
+        this_dict = {}
+        this_dict['data_session'] = proposal_num
+        this_dict['saf_id'] = saf_num
+        this_dict['session_id'] = session_num
+        return this_dict
+
+    except:
+        print ('problem retrieving beamtime info')
+        return None
 
 #def stow_xrd_sample_number(sample_num):
 #    rkvs.set('PDF:xpdacq:xrd_sample_number', sample_num)

@@ -57,7 +57,15 @@ if xpdacq_version < (1, 1, 0):
     xrun.md['beamline_id'] = glbl['beamline_id']
     xrun.md['group'] = glbl['group']
     xrun.md['facility'] = glbl['facility']
-    beamline_config = _load_beamline_config(glbl['blconfig_path'])
+
+    # This works for Qserver
+    if is_re_worker_active():
+        with open(glbl["blconfig_path"], "r") as f:
+            beamline_config = yaml.unsafe_load(f)
+    else:
+        # This works for BSUI
+        beamline_config = _load_beamline_config(glbl['blconfig_path'])
+    
     xrun.md['beamline_config'] = beamline_config
 
     # insert header to db, either simulated or real
@@ -121,3 +129,8 @@ else:
 
 # remove the uselss names
 del xpdacq_version
+
+# Remove plans Qserver can't interpret
+if is_re_worker_active():
+    del Tramp
+    del Tlist

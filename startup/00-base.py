@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 
 from bluesky.utils import ts_msg_hook
+from bluesky_queueserver import is_re_worker_active
 
 from ophyd.signal import EpicsSignalBase
 # from Tom Caswell to fix the 'None bug' - whatever that is. DO 7/9/2021
@@ -23,6 +24,11 @@ nslsii.configure_base(
     mpl=False,
     publish_documents_with_kafka=True
 )
+# Remove plans that Qserver doesn't cope with
+if is_re_worker_active():
+    del one_1d_step
+    del one_nd_step
+    del one_shot
 
 from pathlib import Path
 
