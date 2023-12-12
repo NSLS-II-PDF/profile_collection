@@ -43,14 +43,14 @@ class SoftLinkCallBack(CallbackBase):
 
 
     def start(self, doc):
-        self.start_doc = doc 
+        self.start_doc = doc
         self.start_uid = doc['uid']
 
     def descriptor(self, doc):
         self.descriptors[doc['uid']] = dict(doc)
 
     def event(self, doc):
-        data_dict = doc['data'] 
+        data_dict = doc['data']
         descriptor_uid = doc['descriptor']
 
         docs = dict(start=self.start_doc,
@@ -60,7 +60,7 @@ class SoftLinkCallBack(CallbackBase):
         prefix = root + "/"
 
         stream_name = self.descriptors[descriptor_uid]['name']
-        
+
         # print("Got name : {}".format(stream_name))
         # print("data dict : {}".format(data_dict))
         for data_key in self.data_keys:
@@ -78,7 +78,7 @@ class SoftLinkCallBack(CallbackBase):
                     os.makedirs(dirname, exist_ok=True)
                     os.symlink(src, dst)
                     prefix, ext = os.path.splitext(dst)
-                    dst_md = prefix + ".txt"  
+                    dst_md = prefix + ".txt"
                     yaml.dump(self.start_doc, open(dst_md, "w"), default_flow_style=False)
                     print("Soft linking {} to {}".format(src, dst))
                     print("Writing metadata to {}".format(dst_md))
@@ -91,7 +91,7 @@ class SoftLinkCallBack(CallbackBase):
 
 
 def check_name_collision(dst):
-    ''' takes a filename and appends extra sequence number 
+    ''' takes a filename and appends extra sequence number
         if exists. Keeps looping until it reaches a non-existing seq number.
 
         assumes an extension present and removes
@@ -108,7 +108,7 @@ def check_name_collision(dst):
             new_dst = prefix + "." + str(num) + "." + suffix
             collision = os.path.isfile(new_dst)
             # print("check_name_collision: collision")
-            num += 1 
+            num += 1
         dst = new_dst
 
     return num, dst
@@ -119,7 +119,7 @@ def filename_from_info(docs, data_info_keys, prefix, suffix):
         from docs (dict of start, descriptor and event docs)
             create a filename according to data_info_keys template
 
-        data_info_keys=[ 
+        data_info_keys=[
             ('start', 'sample_name')
             ('start', 'wavelength')
             ('event', 'data', 'Det_1_Z')
@@ -133,7 +133,7 @@ def filename_from_info(docs, data_info_keys, prefix, suffix):
         if isinstance(key, str):
             filename = filename + key
             first = True
-        else: 
+        else:
             # print("key {} ".format(key))
             # root
             node = docs
@@ -143,8 +143,8 @@ def filename_from_info(docs, data_info_keys, prefix, suffix):
                 if subkey not in node:
                     node = "NULL"
                     break
-                node = node[subkey] 
-    
+                node = node[subkey]
+
             #filename = f"{filename}_{node}"
             if not first:
                 node = "_" + str(node)
@@ -157,7 +157,7 @@ def filename_from_info(docs, data_info_keys, prefix, suffix):
     filename = prefix + filename + suffix
 
     return filename
-    
+
 
 class DarkSubtractionCallback(CallbackBase):
     def __init__(self, cbs, image_key="pe1_image", primary_stream="primary",
@@ -173,7 +173,7 @@ class DarkSubtractionCallback(CallbackBase):
             dark_stream : the dark stream name
 `           db : a Broker instance
 
-            
+
         '''
         # the names of the primary and dark streams
         if db is None:
@@ -189,7 +189,7 @@ class DarkSubtractionCallback(CallbackBase):
 
 
     def start(self, doc):
-        self.start_doc = doc 
+        self.start_doc = doc
         self.start_uid = doc['uid']
 
     def descriptor(self, doc):
@@ -199,9 +199,9 @@ class DarkSubtractionCallback(CallbackBase):
 
 
     def event(self, doc):
-        data_dict = doc['data'] 
+        data_dict = doc['data']
         descriptor_uid = doc['descriptor']
-        
+
         #added by DO to fix crash where streams not relevant to xpdac exist (like baseline)
         try:
             stream_name = self.descriptors[descriptor_uid]['name'] #original line
@@ -214,7 +214,7 @@ class DarkSubtractionCallback(CallbackBase):
         if (stream_name in [self.pstream, self.dstream] and
             self.image_key in doc['data']):
             event_filled = list(db.fill_events([doc], [self.descriptors[descriptor_uid]]))[0]
-           
+
             self.images[stream_name] = event_filled['data'][self.image_key].astype(np.int32)
 
             # now check if there is an entry in both
@@ -241,7 +241,7 @@ class DarkSubtractionCallback(CallbackBase):
 
                 im.save(filepath)
                 prefix, ext = os.path.splitext(filepath)
-                dst_md = prefix + ".txt"  
+                dst_md = prefix + ".txt"
                 yaml.dump(self.start_doc, open(dst_md, "w"), default_flow_style=False)
                 # print("Filepath: {}".format(filepath))
                 #for nds in self.create_docs(dsub_image):
@@ -252,12 +252,12 @@ class DarkSubtractionCallback(CallbackBase):
         # TODO : play with mode
         im = Image.fromarray(data, mode="I;16")
         im.save(filename)
- 
+
     def create_docs(self, data):
-        '''        
+        '''
             Custom doc creation script for bg subbed image.
             Outputs only one image for now.
-        '''        
+        '''
         start_doc = self.start_doc.copy()
         start_doc['uid'] = str(uuid.uuid4())
         start_doc['time'] = time.time()
@@ -267,7 +267,7 @@ class DarkSubtractionCallback(CallbackBase):
         new_desc['data_keys'] = dict()
         new_desc['data_keys'][self.image_key] = \
             old_desc['data_keys'][self.image_key].copy()
-        new_desc['name'] = 'bgsub' 
+        new_desc['name'] = 'bgsub'
         new_desc['run_start'] = start_doc['uid']
         new_desc['time'] = time.time()
         new_desc['uid'] = str(uuid.uuid4())
@@ -290,7 +290,7 @@ class DarkSubtractionCallback(CallbackBase):
         new_stop['time'] = time.time()
         yield ('stop', new_stop)
 
-                    
+
     def clear_images(self):
         self.images = dict()
 
@@ -340,7 +340,7 @@ def get_file_list(datum_id, db):
 #data_keys = [pe1.image.name]
 data_keys = ["pe1_image"]
 #data_info_keys = ["Det_1_Z"]#Det_1_Z.name]
-data_info_keys_softlink = [ 
+data_info_keys_softlink = [
     ('start', 'cycle'),
     "/",
     ('start', 'Proposal ID'),
@@ -357,7 +357,7 @@ data_info_keys_softlink = [
     ('descriptor', 'name'),
 ]
 
-data_info_keys_bgsub=[ 
+data_info_keys_bgsub=[
     ('start', 'cycle'),
     "/",
     ('start', 'Proposal ID'),
@@ -385,4 +385,3 @@ bgsub_callback =  DarkSubtractionCallback([soft_link_callback],
                                           data_info_keys=data_info_keys_bgsub)
 
 RE.subscribe(bgsub_callback)
-

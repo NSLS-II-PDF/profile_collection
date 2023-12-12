@@ -1,0 +1,7 @@
+conda activate 2021-3.1-py37
+OVERLAY=/nsls2/data/pdf/shared/config/bluesky_overlays/2021-3.1-py37
+PATH=$OVERLAY/bin:$PATH
+PYTHONPATH=$OVERLAY/lib/python3.7/site-packages:$PYTHONPATH
+export PATH
+export PYTHONPATH
+export BS_ENV=/nsls2/data/pdf/shared/config/profile_collection

@@ -55,8 +55,6 @@ def agent_directive(tla, name, doc):
 
 
 
-
-
 def agent_redisAware_XRDcount(position: float, *, md=None):
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
     #fixing motor for now
@@ -80,7 +78,7 @@ def agent_redisAware_XRDcount(position: float, *, md=None):
     if bool(rkvs.exists('PDF:xpdacq:xrd_sample_number')):
         sample_number = int(rkvs.get('PDF:xpdacq:xrd_sample_number').decode('utf-8')) #here is the sample num
     else:
-        print ('missing sample number in redis')    
+        print ('missing sample number in redis')
 
     #gettting sample metadata from redis
     if bool(rkvs.exists('PDF:xpdacq:sample_dict')):
@@ -124,12 +122,12 @@ def agent_take_the_shot(xpdacq_sample_num=0, exposure=5, md=None):
         p_info = rkvs.get('PDF:xpdacq:sample_dict')
     else:
         print ('missing bt sample info, need to stow_bt_sample_info')
-    
+
     all_sample_info = json.loads(p_info)
     sample_name = list(all_sample_info)[xpdacq_sample_num]
-    this_sample_md = all_sample_info[sample_name] #here is the sample metadata from bt 
+    this_sample_md = all_sample_info[sample_name] #here is the sample metadata from bt
     calib_md = json.loads(rkvs.get('PDF:xpdacq:xrd_calibration_md'))
-    
+
     #getting the user_config from redis
     p_my_config = rkvs.get("PDF:xpdacq:user_config:far")
     user_config = json.loads(p_my_config) #here is the user_config
@@ -153,7 +151,7 @@ def agent_take_the_shot(xpdacq_sample_num=0, exposure=5, md=None):
 
 ##########
 
-    
+
 
 def agent_redisAware_PDFcount(position: float, *, md=None):
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
@@ -174,20 +172,20 @@ def agent_redisAware_PDFcount(position: float, *, md=None):
     #getting the user_config from redis
     p_my_config = rkvs.get("PDF:xpdacq:user_config:near")
     user_config = json.loads(p_my_config) #here is the user_config
-    
+
     #getting the current sample number from redis
     #check if this exists, then read
     if bool(rkvs.exists('PDF:xpdacq:pdf_sample_number')):
         sample_number = int(rkvs.get('PDF:xpdacq:pdf_sample_number').decode('utf-8')) #here is the sample num
     else:
         print ('missing sample number in redis')
-    
+
     #gettting sample metadata from redis
     p_info = rkvs.get('PDF:xpdacq:sample_dict')
     all_sample_info = json.loads(p_info)
     sample_name = list(all_sample_info)[sample_number]
     this_sample_md = all_sample_info[sample_name] #here is the sample metadata from bt
-    
+
     #get the PDF calibration info from redis
     #print ('loading calibration from redis.\n\n\n')
     pdf_calib_md = json.loads(rkvs.get('PDF:xpdacq:pdf_calibration_md'))
@@ -237,7 +235,7 @@ def agent_redisAware_count(position: float, *, md=None):
 
     #getting the current sample number from redis
     sample_number = int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8')) #here is the sample num
-    
+
     #gettting sample metadata from redis
     p_info = rkvs.get('PDF:xpdacq:sample_dict')
     all_sample_info = json.loads(p_info)
@@ -264,7 +262,7 @@ def agent_redisAware_count(position: float, *, md=None):
     _md.update(this_sample_md)
     _md.update(md or {})
     yield from simple_ct([pe1c], exposure, md=_md)
-               
+
 
 
 def agent_sample_count(motor, position: float, exposure: float, *, sample_number: int, md=None):
@@ -286,7 +284,7 @@ def agent_sample_count(motor, position: float, exposure: float, *, sample_number
     _md.update(get_metadata_for_sample_number(bt, sample_number))
     _md.update(md or {})
     yield from simple_ct([pe1c], exposure, md=_md)
-               
+
 @bpp.run_decorator(md={})
 def agent_driven_nap(delay: float, *, delay_kwarg: float = 0):
     """Ensuring we can auto add 'agent_' plans and use args/kwargs"""
@@ -295,7 +293,7 @@ def agent_driven_nap(delay: float, *, delay_kwarg: float = 0):
     else:
         yield from bps.sleep(delay)
 
-               
+
 def agent_print_glbl_val(key: str):
     """
     Get common global values from a namespace dictionary.

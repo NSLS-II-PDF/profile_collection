@@ -12,7 +12,7 @@ This file will do the following changes to the name space:
 XpdAcq < 1.1.0 uses the 94-load.bak file.
 """
 import xpdacq
-
+import yaml
 xpdacq_version = tuple(map(int, xpdacq.__version__.split(".")))
 
 if xpdacq_version < (1, 1, 0):
@@ -65,7 +65,7 @@ if xpdacq_version < (1, 1, 0):
     else:
         # This works for BSUI
         beamline_config = _load_beamline_config(glbl['blconfig_path'])
-    
+
     xrun.md['beamline_config'] = beamline_config
 
     # insert header to db, either simulated or real

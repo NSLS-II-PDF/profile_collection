@@ -1,23 +1,41 @@
 import time as ttime
-from ophyd.areadetector import (PerkinElmerDetector, ImagePlugin,
-                                TIFFPlugin, HDF5Plugin,
-                                ProcessPlugin, ROIPlugin)
-from ophyd.device import BlueskyInterface
+from ophyd.areadetector import DetectorBase as _PerkinElmerDetector
+from ophyd.areadetector.plugins import (
+    ImagePlugin_V34 as ImagePlugin,
+    TIFFPlugin_V34 as TIFFPlugin,
+    HDF5Plugin_V34 as HDF5Plugin,
+    ProcessPlugin_V34 as ProcessPlugin,
+    ROIPlugin_V34 as ROIPlugin,
+    StatsPlugin_V34 as StatsPlugin,
+)
+from ophyd.areadetector.cam import CamBase as _PerkinElmerDetectorCam
+from ophyd.device import BlueskyInterface, Component as Cpt
 from ophyd.areadetector.trigger_mixins import SingleTrigger, MultiTrigger
-from ophyd.areadetector.filestore_mixins import (FileStoreIterativeWrite,
-                                                 FileStoreHDF5IterativeWrite,
-                                                 FileStoreTIFFSquashing,
-                                                 FileStoreTIFF)
-from ophyd import Signal, EpicsSignal, EpicsSignalRO # Tim test
+from ophyd.areadetector.filestore_mixins import (
+    FileStoreIterativeWrite,
+    FileStoreHDF5IterativeWrite,
+    FileStoreTIFFSquashing,
+    FileStoreTIFF,
+)
+from ophyd import Signal, EpicsSignal, EpicsSignalRO  # Tim test
 from ophyd import Component as C, Device, DeviceStatus
 from ophyd import StatusBase
 
-from nslsii.ad33 import StatsPluginV33
+
+
+class PerkinElmerDetectorCam(_PerkinElmerDetectorCam):
+    pool_max_buffers = None
+    pe_dwell_time = None
+    pe_sync_time = None
+    pe_system_id = None
+
+class PerkinElmerDetector(_PerkinElmerDetector):
+    cam = Cpt(PerkinElmerDetectorCam, 'cam1:')
 
 # from shutter import sh1
 
-#shctl1 = EpicsSignal('XF:28IDC-ES:1{Det:PE1}cam1:ShutterMode', name='shctl1')
-#shctl1 = EpicsMotor('XF:28IDC-ES:1{Sh2:Exp-Ax:5}Mtr', name='shctl1')
+# shctl1 = EpicsSignal('XF:28IDC-ES:1{Det:PE1}cam1:ShutterMode', name='shctl1')
+# shctl1 = EpicsMotor('XF:28IDC-ES:1{Sh2:Exp-Ax:5}Mtr', name='shctl1')
 
 # monkey patch for trailing slash problem
 def _ensure_trailing_slash(path, path_semantics=None):
@@ -164,7 +182,7 @@ class XPDPerkinElmer(PerkinElmerDetector):
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA
-             read_attrs=[]) #- MA  
+             read_attrs=[]) #- MA
     # hdf5 = C(XPDHDF5Plugin, 'HDF1:',
     #          write_path_template='G:/pe1_data/%Y/%m/%d/',
     #          read_path_template='/direct/XF28ID2/pe1_data/%Y/%m/%d/',
@@ -179,16 +197,16 @@ class XPDPerkinElmer(PerkinElmerDetector):
     images_per_set = C(Signal, value=1, add_prefix=())
     number_of_sets = C(Signal, value=1, add_prefix=())
 
-    stats1 = C(StatsPluginV33, 'Stats1:')
-    stats2 = C(StatsPluginV33, 'Stats2:')
-    stats3 = C(StatsPluginV33, 'Stats3:')
-    stats4 = C(StatsPluginV33, 'Stats4:')
-    stats5 = C(StatsPluginV33, 'Stats5:')
+    stats1 = C(StatsPlugin, "Stats1:")
+    stats2 = C(StatsPlugin, "Stats2:")
+    stats3 = C(StatsPlugin, "Stats3:")
+    stats4 = C(StatsPlugin, "Stats4:")
+    stats5 = C(StatsPlugin, "Stats5:")
 
-    roi1 = C(ROIPlugin, 'ROI1:')
-    roi2 = C(ROIPlugin, 'ROI2:')
-    roi3 = C(ROIPlugin, 'ROI3:')
-    roi4 = C(ROIPlugin, 'ROI4:')
+    roi1 = C(ROIPlugin, "ROI1:")
+    roi2 = C(ROIPlugin, "ROI2:")
+    roi3 = C(ROIPlugin, "ROI3:")
+    roi4 = C(ROIPlugin, "ROI4:")
 
     # dark_image = C(SavedImageSignal, None)
 
@@ -291,10 +309,10 @@ class ContinuousAcquisitionTrigger(BlueskyInterface):
              #old style, simple runtime error (no rescue attempt)
              #raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
              #                   "the detector to already be acquiring.")
-             
-        #if we get this far, we can now stage the detector. 
+
+        #if we get this far, we can now stage the detector.
         super().stage()
-        
+
         # put logic to look up proper dark frame
         # die if none is found
 
@@ -449,4 +467,3 @@ class CachedDetector:
 
 # some defaults, as an example of how to use this
 # pe1.configure(dict(images_per_set=6, number_of_sets=10))
-
