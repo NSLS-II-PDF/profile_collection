@@ -1,3 +1,8 @@
+import xpdacq.xpdacq
+xpdacq.xpdacq._inject_calibration_md = lambda msg: msg
+xpdacq.xpdacq._inject_calibration_md = lambda msg: msg
+
+
 try:
     ###############################################################################
     # TODO: remove this block once https://github.com/bluesky/ophyd/pull/959 is
