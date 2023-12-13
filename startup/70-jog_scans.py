@@ -110,7 +110,7 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
                                     num=num))
 
 
-def jog(dets, exposure_s, motor, start, stop):
+def jog(dets, exposure_s, motor, start, stop, md=None):
     """pass total exposure time (in seconds), motor name (i.e. Grid_Y), start and stop positions for the motor."""
     # yield from rocking_ct([pilatus], exposure_s, motor, start, stop)
-    yield from rocking_ct(dets, exposure_s, motor, start, stop)
+    yield from rocking_ct(dets, exposure_s, motor, start, stop, md=md)

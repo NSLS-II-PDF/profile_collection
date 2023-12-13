@@ -116,6 +116,66 @@ def agent_redisAware_XRDcount(position: float, *, md=None):
     _md.update(md or {})
     yield from simple_ct([pe1c], exposure, md=_md)
 
+
+##############
+
+def agent_move_and_measure_hanukkah23(x, y,
+        xpdacq_sample_num = 0,
+        exposure = 30,
+        md=None):
+    
+    xlims = (-195, -110)
+    ylims = (10, 90)
+
+    if not (xlims[0] < x < xlims[1]):
+        raise ValueError(f'The target {x=} is out of bounds {xlims}')
+        
+    if not (ylims[0] < y < ylims[1]):
+        raise ValueError(f'The target {y=} is out of bounds {ylims}')
+
+    xstage = OT_stage_2_X
+    ystage = OT_stage_2_Y
+
+    rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
+
+    #assured that our requested position is in bounds, we can move.
+    yield from bps.mv(xstage, x, ystage, y)
+
+    if bool(rkvs.exists('PDF:xpdacq:sample_dict')):
+        p_info = rkvs.get('PDF:xpdacq:sample_dict')
+    else:
+        print ('missing bt sample info, need to stow_bt_sample_info')
+    
+    all_sample_info = json.loads(p_info)
+    sample_name = list(all_sample_info)[xpdacq_sample_num]
+    this_sample_md = all_sample_info[sample_name] #here is the sample metadata from bt 
+    calib_md = json.loads(rkvs.get('PDF:xpdacq:pdf_calibration_md'))
+    
+    #getting the user_config from redis
+    p_my_config = rkvs.get("PDF:xpdacq:user_config:near")
+    user_config = json.loads(p_my_config) #here is the user_config
+
+    _md = {'more_info': dict(
+        Grid_X=Grid_X.read(),
+        Grid_Y=Grid_Y.read(),
+        Grid_Z=Grid_Z.read(),
+        Det_1_X=Det_1_X.read(),
+        Det_1_Y=Det_1_Y.read(),
+        Det_1_Z=Det_1_Z.read(),
+        xstage=xstage.read(),
+        ystage=ystage.read(),
+        ring_current=ring_current.read(),
+        BStop1=BStop1.read(),
+        user_config=user_config,
+        calibration_md = calib_md,
+    )}
+    #_md.update(get_metadata_for_sample_number(bt, sample_number))
+    _md.update(this_sample_md)
+    _md.update(md or {})
+    yield from jog([pilatus1], exposure, ystage, y,y, md=_md)
+    #yield from simple_ct([pilatus1], exposure, md=_md)
+
+
 ##############
 def agent_take_the_shot(xpdacq_sample_num=0, exposure=5, md=None):
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store

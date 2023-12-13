@@ -132,7 +132,7 @@ del xpdacq_version
 
 class MoreCustomizedRunEngine(CustomizedRunEngine):
     def __call__(self, plan, *args, **kwargs):
-        super().__call__({}, plan, *args, **kwargs)
+        super().__call__({}, plan, *args, dark_strategy=no_dark, **kwargs)
 
 
 from bluesky.utils import ts_msg_hook
