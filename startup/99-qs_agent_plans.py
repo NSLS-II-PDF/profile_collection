@@ -151,10 +151,50 @@ def agent_take_the_shot(xpdacq_sample_num=0, exposure=5, md=None):
     _md.update(md or {})
     yield from simple_ct([pe1c], exposure, md=_md)
 
-##########
+##%%%%%%%%%%%##
+
+def agent_redisAware_XRDcount_dos(md=None):
+    rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
+
+    #getting the user_config from redis
+    p_my_config = rkvs.get("PDF:xpdacq:user_config:far")
+    user_config = json.loads(p_my_config) #here is the user_config
+    
+    #getting the current sample number from redis
+    sample_number = 0
+    
+    #gettting sample metadata from redis
+    p_info = rkvs.get('PDF:xpdacq:sample_dict')
+    all_sample_info = json.loads(p_info)
+    sample_name = list(all_sample_info)[sample_number]
+    this_sample_md = all_sample_info[sample_name] #here is the sample metadata from bt
+    
+    #get the PDF calibration info from redis
+    pdf_calib_md = json.loads(rkvs.get('PDF:xpdacq:xrd_calibration_md'))
+
+    #getting exposure time from redis
+    exposure = 5.0
+    print ('exposure is '+str(exposure))
+
+    _md = dict(
+        Grid_X=Grid_X.read(),
+        Grid_Y=Grid_Y.read(),
+        Grid_Z=Grid_Z.read(),
+        Det_1_X=Det_1_X.read(),
+        Det_1_Y=Det_1_Y.read(),
+        Det_1_Z=Det_1_Z.read(),
+        ring_current=ring_current.read(),
+        BStop1=BStop1.read(),
+        user_config=user_config,
+        calibration_md=pdf_calib_md,
+    )
+    _md.update(this_sample_md)
+    _md.update(md or {})
+    yield from simple_ct([pe1c], exposure, md=_md)
+
 
     
-
+##%%%%%%%%####
 def agent_redisAware_PDFcount(position: float, *, md=None):
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
     #fixing motor for now
@@ -222,7 +262,7 @@ def agent_redisAware_PDFcount(position: float, *, md=None):
     #print ('and _md is '+str(_md))
     yield from simple_ct([pe1c], exposure, md=_md)
 
-
+###############
 
 
 def agent_redisAware_count(position: float, *, md=None):
