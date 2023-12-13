@@ -105,7 +105,9 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
         yield from bps.wait(group=gp)
         start, stop = stop, start
 
-    return (yield from future_count(dets, md=_md, per_shot=per_shot, num=num))
+    return (yield from future_count(dets, md=_md, 
+                                    per_shot=per_shot if start != stop else bps.trigger_and_read, 
+                                    num=num))
 
 
 def jog(dets, exposure_s, motor, start, stop):
