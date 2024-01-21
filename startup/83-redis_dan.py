@@ -111,17 +111,17 @@ def retrieve_background():
     y = ast.literal_eval(rkvs.get('PDF:bgd:y').decode('utf-8'))
     return x,y
 
-#def stow_sample_number(sample_num):
-#    rkvs.set('PDF:xpdacq:sample_number', sample_num)
+def stow_sample_number(sample_num):
+    rkvs.set('PDF:xpdacq:sample_number', sample_num)
 
-#def retrieve_sample_number():
-#    return int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8'))
+def retrieve_sample_number():
+    return int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8'))
 
-#def stow_exposure_time(exposure_time):
-#    rkvs.set('PDF:desired_exposure_time',exposure_time)
+def stow_exposure_time(exposure_time):
+    rkvs.set('PDF:desired_exposure_time',exposure_time)
 
-#def retrieve_exposure_time():
-#    return float(rkvs.get('PDF:desired_exposure_time').decode('utf-8'))
+def retrieve_exposure_time():
+    return float(rkvs.get('PDF:desired_exposure_time').decode('utf-8'))
 
 #def stow_sample_info(sample_num):
 #    info =dict(bt.samples[list(bt.samples.keys())[sample_num]])
