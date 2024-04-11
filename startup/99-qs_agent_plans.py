@@ -121,7 +121,7 @@ def agent_redisAware_XRDcount(position: float, *, md=None):
 
 def agent_move_and_measure_hanukkah23(x, y,
         xpdacq_sample_num = 0,
-        exposure = 30,
+        exposure = None,
         md=None):
     
     xlims = (-195, -110)
@@ -137,6 +137,14 @@ def agent_move_and_measure_hanukkah23(x, y,
     ystage = OT_stage_2_Y
 
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
+
+    #now getting sample info from redis, such as exposure and sample_number
+    if exposure == None:
+        if bool(rkvs.exists('PDF:desired_exposure_time')):
+            exposure = float(self.rkvs.get('PDF:desired_exposure_time'))
+        else:
+            print ("missing exposure time in redis, defaulting to 10 s")
+            expsoure = 10.0
 
     #assured that our requested position is in bounds, we can move.
     yield from bps.mv(xstage, x, ystage, y)
