@@ -630,7 +630,7 @@ def get_total_counts():
     #return float(caget("XF:28ID1-ES{Det:PE2}Stats1:Total_RBV")) #for pe2c
 
 
-def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
+def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx, use_pe2c=False):
     from epics import caget
     #ensure shutter is closedi
     print ('closing shutter')
@@ -657,6 +657,9 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
 
         if use_det == True:
             my_int = float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
+            if use_pe2c:
+                my_int = float(caget("XF:28ID1-ES{Det:PE2}Stats5:Total_RBV"))  
+                time.sleep(.5)
         else:
             my_int = float(caget("XF:28ID1B-OP{Det:1-Det:2}Amp:bkgnd"))
 
