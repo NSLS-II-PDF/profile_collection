@@ -1,3 +1,5 @@
+import shutil
+config_dir = "/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/config_base/"
 "Define Beamline Modes"
 def beam22slit(): 
 	#print("Resetting white beam slits") 2021-3 values
