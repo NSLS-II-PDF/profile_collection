@@ -120,12 +120,12 @@ def agent_redisAware_XRDcount(position: float, *, md=None):
 ##############
 
 def agent_move_and_measure_hanukkah23(x, y,
-        xpdacq_sample_num = 0,
+        xpdacq_sample_num = None,
         exposure = None,
         md=None):
     
-    xlims = (-195, -110)
-    ylims = (10, 90)
+    xlims = (-165, -88)
+    ylims = (9, 87)
 
     if not (xlims[0] < x < xlims[1]):
         raise ValueError(f'The target {x=} is out of bounds {xlims}')
@@ -137,14 +137,17 @@ def agent_move_and_measure_hanukkah23(x, y,
     ystage = OT_stage_2_Y
 
     rkvs = redis.Redis(host="info.pdf.nsls2.bnl.gov", port=6379, db=0)  # redis key value store
+    
+    if xpdacq_sample_num is None:
+        xpdacq_sample_num = int(rkvs.get('PDF:xpdacq:sample_number').decode('utf-8')) #here is the sample num
 
     #now getting sample info from redis, such as exposure and sample_number
     if exposure == None:
         if bool(rkvs.exists('PDF:desired_exposure_time')):
-            exposure = float(self.rkvs.get('PDF:desired_exposure_time'))
+            exposure = float(rkvs.get('PDF:desired_exposure_time'))
         else:
             print ("missing exposure time in redis, defaulting to 10 s")
-            expsoure = 10.0
+            exposure = 10.0
 
     #assured that our requested position is in bounds, we can move.
     yield from bps.mv(xstage, x, ystage, y)
@@ -163,23 +166,39 @@ def agent_move_and_measure_hanukkah23(x, y,
     p_my_config = rkvs.get("PDF:xpdacq:user_config:near")
     user_config = json.loads(p_my_config) #here is the user_config
 
+
+    cx = -128.85
+    cy = 49.91
+    cxy = (cx,cy)
+    rx = xstage.read()['OT_stage_2_X']['value']-cxy[0],
+    ry = ystage.read()['OT_stage_2_Y']['value']-cxy[1],
+    
     _md = {'more_info': dict(
+        xstage=xstage.read(),
+        ystage=ystage.read(),
+        center_xy = cxy,
+        
+        rel_to_center_x = rx,
+        rel_to_center_y = ry,
+        rel_to_center_xy = (rx,ry),
+    
         Grid_X=Grid_X.read(),
         Grid_Y=Grid_Y.read(),
         Grid_Z=Grid_Z.read(),
         Det_1_X=Det_1_X.read(),
         Det_1_Y=Det_1_Y.read(),
         Det_1_Z=Det_1_Z.read(),
-        xstage=xstage.read(),
-        ystage=ystage.read(),
         ring_current=ring_current.read(),
-        BStop1=BStop1.read(),
-        user_config=user_config,
-        calibration_md = calib_md,
-    )}
+        BStop1=BStop1.read()),
+
+        'user_config':user_config,
+        
+        'calibration_md': calib_md,
+    }
     #_md.update(get_metadata_for_sample_number(bt, sample_number))
     _md.update(this_sample_md)
     _md.update(md or {})
+    print (f"{exposure=}")
     yield from jog([pilatus1], exposure, ystage, y,y, md=_md)
     #yield from simple_ct([pilatus1], exposure, md=_md)
 

@@ -228,7 +228,7 @@ class XPDPerkinElmer1(XPDPerkinElmer):
 class XPDPerkinElmer2(XPDPerkinElmer):
     tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
              #write_path_template='Z:/data/pe2_data/%Y/%m/%d', #- DO
-             write_path_template='J:\\%Y\\%m\\%d\\', #- DO
+             write_path_template='Y:\\legacy\\raw\\pe2_data\\%Y\\%m\\%d\\', #- DO
              #write_path_template='Z:/img/%Y/%m/%d/', #- MA
              #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
              read_path_template='/nsls2/data/pdf/legacy/raw/pe2_data/%Y/%m/%d/', #- DO

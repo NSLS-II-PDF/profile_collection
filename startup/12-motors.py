@@ -24,6 +24,7 @@ class BeamStop(Device):
 
 BStop1 = BeamStop('XF:28ID1B-ES{BS:1-Ax:', name='BStop1')
 BStop2 = BeamStop('XF:28ID1B-ES{BS:2-Ax:', name='BStop2')
+Bstop_Tbl = BeamStop('XF:28ID1B-ES{BS:Tbl-Ax:', name='BStop2_Tbl')
 
 # OCM table widget
 class OCMTable(Device):
@@ -94,7 +95,9 @@ fb_two_button_shutters = FilterBankTwoButtonShutter('XF:28ID1B-OP{Fltr:', name='
 # Spinner Goniohead motors, add by HZ
 Spinnergo_X = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:X}Mtr', name='Spinnergo_X', labels=['positioners'])
 Spinnergo_Y = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Y}Mtr', name='Spinnergo_Y', labels=['positioners'])
-Spinnergo_Z = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Z}Mtr', name='Spinnergo_Z', labels=['positioners'])
+#Spinnergo_Z = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Z}Mtr', name='Spinnergo_Z', labels=['positioners']) 
+Beam_stop_TBL2 = EpicsMotor('XF:28ID1B-ES{Stg:FTIR-Ax:Y}Mtr', name='Beam_stop_TBL2', labels=['positioners'])
+# Above two lines were modified by GK and MA on 01/24/2025
 Spinnergo_Ry = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Ry}Mtr', name='Spinnergo_Ry', labels=['positioners'])
 
 Tomo_spinner = EpicsMotor('XF:28ID1B-ES{Smpl:Chngr-Ax:YRot}Mtr', name='Tomo_spinner', labels=['positiioners'])
@@ -119,6 +122,7 @@ noxbox_y = EpicsMotor('XF:28ID1B-ES{NOx-Ax:Y}Mtr', name='noxbox_y')
 
 #Table stages
 OT_stage_1_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X1}Mtr', name='OT_stage_1_X', labels=['positioners'])
+OT_stage_1_Y = EpicsMotor('XF:28ID1B-ES{Stg:FTIR-Ax:Y}Mtr', name='OT_stage_1_Y', labels=['positioners'])
 
 OT_stage_2_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X2}Mtr', name='OT_stage_2_X', labels=['positioners'])
 OT_stage_2_Y = EpicsMotor('XF:28ID1B-ES:1{Sample:Tbl-Ax:Y1}Mtr', name='OT_stage_2_Y', labels=['positioners'])
@@ -127,3 +131,6 @@ OT_stage_3_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X3}Mtr', name='OT_stage_3_X', labe
 
 OT_stage_4_X = EpicsMotor('XF:28ID1-ES{Det-Ax:X4}Mtr', name='OT_stage_4_X', labels=['positioners'])
 
+
+
+#Pin_diode = EpicsMotor('XF:28ID1B-OP{Det:1-Det:2}Amp:bkgnd', name='Pin_diode', labels=['positioners'])  #GK added on Feb12,2025

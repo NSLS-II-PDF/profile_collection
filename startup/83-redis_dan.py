@@ -6,7 +6,7 @@ redis_host = 'info.pdf.nsls2.bnl.gov'
 rkvs = redis.Redis(host=redis_host, port=6379, db=0)
 
 my_config = {'auto_mask': False,
-    'user_mask': '/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/my_mask.npy',
+    'user_mask': '/nsls2/data/pdf/pdfhack/legacy/processed/xpdacq_data/user_data/my_mask_xrd3.npy',
     'method': 'splitpixel'} 
 
 

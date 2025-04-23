@@ -46,7 +46,7 @@ class Eurotherm(EpicsSignalPositioner):
 	def set(self, *args, **kwargs):
 		return super().set(*args, timeout=100000, **kwargs)
 
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I', write_pv='XF:28ID1-ES:1{Env:04}T-SP', tolerance = 5, name='eurotherm')
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I', write_pv='XF:28ID1-ES:1{Env:04}T-SP', tolerance = 1, name='eurotherm')
 
 class CryoStream(Device):
     # readback
@@ -283,7 +283,7 @@ class LinkamFurnace(PVPositioner):
 
 # To allow for sample temperature equilibration time, increase
 # the `settle_time` parameter (units: seconds).
-linkam_furnace = LinkamFurnace('XF:28ID1-ES{LINKAM}:', name='cs700',
+linkam_furnace = LinkamFurnace('XF:28ID1-ES{LINKAM}:', name='linkam_furnace',
                                    settle_time=0)
 linkam_furnace.done_value = 3
 linkam_furnace.stop_value = 0
@@ -291,6 +291,56 @@ linkam_furnace.setpoint.kind = "normal"
 linkam_furnace.readback.kind = "normal"
 linkam_furnace.readback.name = 'temperature'
 linkam_furnace.setpoint.name = 'temperature_setpoint'
+
+
+#added by Gihan/Hui for Linkam T96 on 02/18/2025
+#This is working. Minimum temp is about 25oC.
+######useful command for Linkam_T96
+#linkam_T96.ramprate.get(), or linkam_T96.ramprate.set(target_ramprate)
+#linkam_T96.setpoint.set(target_temp)
+#linkam_T96.readback.get()  or linkam_T96.temperature.get()
+#linkam_T96.move(target_temp)
+####RE(mv(linkam_T96, target_temp)) is "not working" on 2/20/2025
+
+class LinkamFurnace_T96(PVPositioner):
+    readback = C(EpicsSignalRO, ':TEMP')
+    setpoint = C(EpicsSignal, ':SETPOINT:SET')
+    done = C(EpicsSignalRO, ':STATUS')
+    stop_signal = C(EpicsSignal, ':STATUS')
+    temperature = C(EpicsSignal, ":TEMP")
+    ramprate = C(EpicsSignal,":RAMPRATE:SET")
+    
+
+    def __init__(self, *args, setpoint_tolerance=1, **kwargs):
+        
+        # Sets tolerance for skipping `set` calls when already at setpoint.
+        self.setpoint_tolerance = setpoint_tolerance
+        super().__init__(*args, **kwargs)
+
+    def set(self, new_position, *args, timeout=None, **kwargs):
+
+        # Check if new setpoint is within one degree of current temperature, and if the controller is
+        # at it's setpoint. If it is, return that the move was successful instantly to avoid lockup.
+        if abs(self.readback.get() - new_position) < self.setpoint_tolerance and self.status.get() & 4 == 1:
+            return DeviceStatus(self, success=True, done=True)
+        else:
+            return super().set(*args, timeout=timeout, **kwargs)
+
+    def trigger(self):
+        # There is nothing to do. Just report that we are done.
+        # Note: This really should not necessary to do --
+        # future changes to PVPositioner may obviate this code.
+        status = DeviceStatus(self)
+        status._finished()
+        return status
+linkam_T96 = LinkamFurnace_T96('XF:28ID1-ES{LINKAM:T96}',name='linkam_T96',settle_time=0)
+linkam_T96.done_value = 22
+linkam_T96.stop_value = 22
+linkam_T96.readback.kind = "normal"
+linkam_T96.readback.name = 'temperature'
+linkam_T96.setpoint.name = 'temperature_setpoint'
+linkam_T96.ramprate.name = 'ramprate'
+
 
 ## MA
 class Magnet(PVPositioner):

@@ -1,195 +1,63 @@
 import shutil
 config_dir = "/nsls2/data/pdfhack/legacy/processed/xpdacq_data/user_data/config_base/"
 "Define Beamline Modes"
-def beam22slit(): 
-	#print("Resetting white beam slits") 2021-3 values
-	#wb_slits.inboard.move(-11.55)
-	#wb_slits.outboard.move(-5.879)
-	
-	#print("Resetting Monochromator") # 2021-3 values
-	#sbm.yaw.move(0.00012)
-	#sbm.roll.move(0.0008)
-	#sbm.pitch.move(-0.02827)
-	#sbm.bend.move(2000.0084)
-	#sbm.twist.move(0)
 
-	print("Resetting Mirror")
-	#Mirror_VFM.y_upstream.move(-1.2493) # 2021-3 values
-	#Mirror_VFM.y_downstream_inboard.move(-0.3179)
-	#Mirror_VFM.y_downstream_outboard.move(-0.0806)
-	Mirror_VFM.bend_upstream.move(100)
-	Mirror_VFM.bend_downstream.move(100)
+def change_energy(option=None):   
+    file_path = "~/Documents/MA/Look_up_table.xlsx"
+    df = pd.read_excel(file_path)
+    Ophyd_object_setpoint = []
+    
+    print("Please select an option:")
+    for i in range(len(df.columns)):
+        print(i , df.columns[i])
+    try:
+        option = int(input().strip())
+    except ValueError:
+        print("Invalid input")
+        return
+    
+    print('\nPlease wait energy change & optics tuneup taking place\n')
+    
+    for i in range(len(df)):
+        if pd.notna(df[df.columns[option]][i]): # If the values are empty pass
+            print(f"{df['Ophyd_object'][i]} , {df[df.columns[option]][i]}")
+            obj_name = df['Ophyd_object'][i]
+            tln, *rest = obj_name.split('.')
+            obj = globals()[tln]
+            for c in rest:
+                obj = getattr(obj, c)
+            Ophyd_object_setpoint.append(obj)
+            Ophyd_object_setpoint.append(df[df.columns[option]][i])
+        
+    #print(Ophyd_object_setpoint)
+    # yield from mv(*A)
+    RE(mv(*Ophyd_object_setpoint))
+    print('\nEnergy change & optics tuneup completed. Please check the beamstopper alignment and perform Enegy calibration measurement\n')
 
-	#print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-765.286)
-	ocm_slits.bottom.move(545.00)
-	ocm_slits.outboard.move(2005.959)
-	ocm_slits.inboard.move(-1939.037)
-
-	print("Resetting Anti-scatter Slits")
-	caput('XF:28ID1B-OP{Slt:AS-Ax:T}Mtr.VAL', -24.95948) #Top
-	caput('XF:28ID1B-OP{Slt:AS-Ax:B}Mtr.VAL', -31.49997) #Bottom
-	caput('XF:28ID1B-OP{Slt:AS-Ax:O}Mtr.VAL', -27.89998) #Outboard
-	caput('XF:28ID1B-OP{Slt:AS-Ax:I}Mtr.VAL', 6.09888) #inboard
-	print("Ready to go !")
-
-def beam22(): 
-	#print("Resetting white beam slits") 2021-3 values
-	#wb_slits.inboard.move(-11.55)
-	#wb_slits.outboard.move(-5.879)
-	
-	#print("Resetting Monochromator") # 2021-3 values
-	#sbm.yaw.move(0.00012)
-	#sbm.roll.move(0.0008)
-	#sbm.pitch.move(-0.02827)
-	#sbm.bend.move(2000.0084)
-	#sbm.twist.move(0)
-
-	print("Resetting Mirror")
-	#Mirror_VFM.y_upstream.move(-1.2493) # 2021-3 values
-	#Mirror_VFM.y_downstream_inboard.move(-0.3179)
-	#Mirror_VFM.y_downstream_outboard.move(-0.0806)
-	Mirror_VFM.bend_upstream.move(150)
-	Mirror_VFM.bend_downstream.move(150)
-
-	#print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-765.286)
-	ocm_slits.bottom.move(545.00)
-	ocm_slits.outboard.move(2005.959)
-	ocm_slits.inboard.move(-1939.037)
-
-	print("Resetting Anti-scatter Slits")
-	caput('XF:28ID1B-OP{Slt:AS-Ax:T}Mtr.VAL', -24.95948) #Top
-	caput('XF:28ID1B-OP{Slt:AS-Ax:B}Mtr.VAL', -31.49997) #Bottom
-	caput('XF:28ID1B-OP{Slt:AS-Ax:O}Mtr.VAL', -27.89998) #Outboard
-	caput('XF:28ID1B-OP{Slt:AS-Ax:I}Mtr.VAL', 6.09888) #inboard
-	print("Ready to go !")
-
-def beam33(): 
-	#print("Resetting white beam slits") 2021-3 values
-	#wb_slits.inboard.move(-11.55)
-	#wb_slits.outboard.move(-5.879)
-	
-	#print("Resetting Monochromator") # 2021-3 values
-	#sbm.yaw.move(0.00012)
-	#sbm.roll.move(0.0008)
-	#sbm.pitch.move(-0.02827)
-	#sbm.bend.move(2000.0084)
-	#sbm.twist.move(0)
-
-	print("Resetting Mirror")
-	#Mirror_VFM.y_upstream.move(-1.2493) # 2021-3 values
-	#Mirror_VFM.y_downstream_inboard.move(-0.3179)
-	#Mirror_VFM.y_downstream_outboard.move(-0.0806)
-	Mirror_VFM.bend_upstream.move(120)
-	Mirror_VFM.bend_downstream.move(120)
-
-	#print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-765.286)
-	ocm_slits.bottom.move(545.00)
-	ocm_slits.outboard.move(2005.959)
-	ocm_slits.inboard.move(-1939.037)
-
-	print("Resetting Anti-scatter Slits")
-	caput('XF:28ID1B-OP{Slt:AS-Ax:T}Mtr.VAL', -24.90948) #Top
-	caput('XF:28ID1B-OP{Slt:AS-Ax:B}Mtr.VAL', -31.44997) #Bottom
-	caput('XF:28ID1B-OP{Slt:AS-Ax:O}Mtr.VAL', -27.84998) #Outboard
-	caput('XF:28ID1B-OP{Slt:AS-Ax:I}Mtr.VAL', 6.19888) #inboard
-	print("Ready to go !")
-
-def beam55(): 
-	#print("Resetting white beam slits") 2021-3 values
-	#wb_slits.inboard.move(-11.55)
-	#wb_slits.outboard.move(-5.879)
-	
-	#print("Resetting Monochromator") # 2021-3 values
-	#sbm.yaw.move(0.00012)
-	#sbm.roll.move(0.0008)
-	#sbm.pitch.move(-0.02827)
-	#sbm.bend.move(2000.0084)
-	#sbm.twist.move(0)
-
-	print("Resetting Mirror")
-	#Mirror_VFM.y_upstream.move(-1.2493) # 2021-3 values
-	#Mirror_VFM.y_downstream_inboard.move(-0.3179)
-	#Mirror_VFM.y_downstream_outboard.move(-0.0806)
-	Mirror_VFM.bend_upstream.move(100)
-	Mirror_VFM.bend_downstream.move(100)
-
-	#print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-665.286)
-	ocm_slits.bottom.move(645.00)
-	ocm_slits.outboard.move(2105.959)
-	ocm_slits.inboard.move(-1839.037)
-
-	print("Resetting Anti-scatter Slits")
-	caput('XF:28ID1B-OP{Slt:AS-Ax:T}Mtr.VAL', -24.80948) #Top
-	caput('XF:28ID1B-OP{Slt:AS-Ax:B}Mtr.VAL', -31.34997) #Bottom
-	caput('XF:28ID1B-OP{Slt:AS-Ax:O}Mtr.VAL', -27.69998) #Outboard
-	caput('XF:28ID1B-OP{Slt:AS-Ax:I}Mtr.VAL', 6.29888) #inboard
-	print("Ready to go !")
+def current_energy():
+    file_path = "~/Documents/MA/Look_up_table.xlsx"
+    df = pd.read_excel(file_path)
+    Ophyd_object_setpoint = []
+    if (4<sbm.pitch.position<6):
+        print('39.1 keV')
+    if (33<sbm.pitch.position<36):
+        print('74.9 keV')
+    if (23<sbm.pitch.position<25):
+        print('110.6 keV')
+    if (-18<sbm.pitch.position<-15):
+        print('98.4 keV')
+    if (-32<sbm.pitch.position<-29):
+        print('63.8 keV')
+    for i in range(len(df)):
+        obj_name = df['Ophyd_object'][i]
+        tln, *rest = obj_name.split('.')
+        obj = globals()[tln]
+        for c in rest:
+            obj = getattr(obj, c)
+        print(df['Ophyd_object'][i], '=',  obj.position)
 
 
-
-def saxs():
-	print("Resetting white beam slits")
-	wb_slits.inboard.move(-13.6)
-	wb_slits.outboard.move(-7.54218)
-	
-	print("Resetting Monochromator")
-	sbm.yaw.move(0.0)
-	sbm.roll.move(0.0)
-	sbm.pitch.move(-0.05149)
-	sbm.bend.move(1550)
-	sbm.twist.move(-30)
-
-	print("Resetting Mirror")
-	Mirror_VFM.y_upstream.move(-0.7)
-	Mirror_VFM.y_downstream_inboard.move(-0.02)
-	Mirror_VFM.y_downstream_outboard.move(0.32)
-	Mirror_VFM.bend_upstream.move(10)
-	Mirror_VFM.bend_downstream.move(10)
-
-	print("Resetting BDM Slits")
-	#bdm_slits.top.move(999.957)
-	#bdm_slits.bottom.move(-94363.970)
-	#bdm_slits.inboard.move(-7600.960)
-	#bdm_slits.outboard.move(-4100.075)
-
-	print("Resetting OCM Slits")
-	ocm_slits.top.move(-1065.0)
-	ocm_slits.bottom.move(1955.0)
-	ocm_slits.outboard.move(635.959)
-	ocm_slits.inboard.move(-94.037)
-	OCM_table.upstream_jack.move(4.14225)
-	OCM_table.downstream_jack.move(-4.1700)
-	OCM_table.X.move(-8.44701)
-	print("Ready to go !")
-
+        
 
 def BDM_plot():
 	from mpl_toolkits.mplot3d import Axes3D
