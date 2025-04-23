@@ -98,7 +98,7 @@ def rocking_ct(dets, exposure, motor, start, stop, *, num=1, md=None):
     def per_shot(dets):
         nonlocal start, stop
         yield from bps.mv(motor, start)  # got to initial position
-        yield from bps.mv(motor.velocity, abs(stop - start) / exposure)  # set velocity
+        yield from bps.mv(motor.velocity, abs(stop - start) / exposure, timeout=1)  # set velocity
         gp = short_uid("rocker")
         yield from bps.abs_set(motor, stop, group=gp)  # set motor to move towards end
         yield from bps.trigger_and_read(dets)  # collect off detector

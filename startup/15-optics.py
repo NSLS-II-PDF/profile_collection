@@ -18,10 +18,12 @@ class Slits(Device):
     yg = Cpt(EpicsMotor, 'YGap}Mtr')
     '''
 
-ocm_slits = Slits('XF:28ID1B-OP{Slt:2-Ax:', name='ocm_slits')  # OCM Slits
-bdm_slits = Slits('XF:28ID1A-OP{Slt:1-Ax:', name='bdm_slits')  # BD Slits
+OCM_slits = Slits('XF:28ID1B-OP{Slt:2-Ax:', name='OCM_slits')  # OCM Slits
+BDM_slits = Slits('XF:28ID1A-OP{Slt:1-Ax:', name='BDM_slits')  # BD Slits
 #Added by MA 09/03/2019
-wb_slits = Slits('XF:28ID1A-OP{Slt:0-Ax:', name='wb_slits')  # WB Slits
+WB_slits = Slits('XF:28ID1A-OP{Slt:0-Ax:', name='WB_slits')  # WB Slits
+#Added by MA 10/21/2024
+cleanup_slits = Slits('XF:28ID1B-OP{Slt:AS-Ax:', name='cleanup_slits')  # WB Slits
 
 
 class SideBounceMono(Device):
@@ -30,8 +32,13 @@ class SideBounceMono(Device):
     yaw = Cpt(EpicsMotor, "Yaw}Mtr")
     pitch = Cpt(EpicsMotor, "Pitch}Mtr")
     roll = Cpt(EpicsMotor, "Roll}Mtr")
-    bend = Cpt(EpicsMotor, "Bend}Mtr")
-    twist = Cpt(EpicsMotor, "Twist}Mtr")
+    #bend = Cpt(EpicsMotor, "Bend}Mtr")
+    #twist = Cpt(EpicsMotor, "Twist}Mtr")
+    # Added below and commented above by MA 10/21/2024
+    bend_inboard_U = Cpt(EpicsMotor, "IU}Mtr")
+    bend_inboard_L = Cpt(EpicsMotor, "IL}Mtr")
+    bend_outboard_U = Cpt(EpicsMotor, "OU}Mtr")
+    bend_outboard_L = Cpt(EpicsMotor, "OL}Mtr")
 
 sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 #temporary fast shutter

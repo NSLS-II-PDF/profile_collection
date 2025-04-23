@@ -5263,127 +5263,6 @@ existing_devices:
     is_movable: true
     is_readable: true
     module: ophyd.epics_motor
-  Sample_holder_Y1:
-    classname: EpicsMotor
-    components:
-      acceleration:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      direction_of_travel:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      high_limit_switch:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      high_limit_travel:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      home_forward:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      home_reverse:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      low_limit_switch:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      low_limit_travel:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      motor_done_move:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      motor_egu:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      motor_is_moving:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      motor_stop:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      offset_freeze_switch:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      set_use_switch:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      user_offset:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      user_offset_dir:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      user_readback:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      user_setpoint:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      velocity:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: ophyd.epics_motor
   Spinnergo_Ry:
     classname: EpicsMotor
     components:
@@ -11837,6 +11716,35 @@ existing_plans:
       name: delay_kwarg
     properties:
       is_generator: true
+  agent_move_and_measure_hanukkah23:
+    module: __main__
+    name: agent_move_and_measure_hanukkah23
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: xpdacq_sample_num
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: exposure
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: md
+    properties:
+      is_generator: true
   agent_print_glbl_val:
     description: 'Get common global values from a namespace dictionary.
 
@@ -11889,6 +11797,17 @@ existing_plans:
       kind:
         name: KEYWORD_ONLY
         value: 3
+      name: md
+    properties:
+      is_generator: true
+  agent_redisAware_XRDcount_dos:
+    module: __main__
+    name: agent_redisAware_XRDcount_dos
+    parameters:
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
       name: md
     properties:
       is_generator: true
@@ -12160,8 +12079,8 @@ existing_plans:
     properties:
       is_generator: true
   configure_area_det:
-    description: Configure exposure time of a detector in continuous acquisition mode
-    module: xpdacq.beamtime
+    description: Configure an area detector in "continuous mode"
+    module: __main__
     name: configure_area_det
     parameters:
     - kind:
@@ -12172,10 +12091,6 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: exposure
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: acq_time
     properties:
       is_generator: true
   configure_area_det2:
@@ -12573,6 +12488,11 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: md
     properties:
       is_generator: true
   kickoff:
